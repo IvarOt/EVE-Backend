@@ -1,2 +1,2 @@
 # evebackend
-RVD Excell group project
+EVE Excell group project
