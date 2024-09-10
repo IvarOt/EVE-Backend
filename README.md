@@ -10,7 +10,7 @@ For the project it is important to work in different branches. Branches are spli
 - feature/ (This is used for new features that are being worked on)
 
 for the name of what is being worked on kebab-case shall be used.
-An example of a branch following these rules is `feature/suggestion-not-submitting`
+An example of a branch following these rules is `feature/homepage`
 
 ## Pull Requests
 No branch is allowed to be merged with the main without a code review by someone who had little to none to do with the code written in that branch.
