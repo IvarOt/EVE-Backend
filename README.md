@@ -1,2 +1,2 @@
 # EVEbackend
-EVE Excell group project
+EVE Excel group project
