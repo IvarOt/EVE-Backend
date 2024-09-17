@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34714.143
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "eve-backend.api", "eve-backend.api\eve-backend.api.csproj", "{EACAF2B3-2F88-4F8E-BFD0-57E7C4E74C6D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "eve-backend.api", "eve-backend.api\eve-backend.api.csproj", "{EACAF2B3-2F88-4F8E-BFD0-57E7C4E74C6D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "eve-backend.logic", "eve-backend.logic\eve-backend.logic.csproj", "{1FC77AA5-333D-448C-AF0B-60EAA490CA64}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "eve-backend.logic", "eve-backend.logic\eve-backend.logic.csproj", "{1FC77AA5-333D-448C-AF0B-60EAA490CA64}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
