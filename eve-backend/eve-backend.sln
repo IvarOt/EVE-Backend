@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "eve-backend.api", "eve-back
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "eve-backend.logic", "eve-backend.logic\eve-backend.logic.csproj", "{1FC77AA5-333D-448C-AF0B-60EAA490CA64}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "eve-backend.data", "eve-backend.data\eve-backend.data.csproj", "{3003265D-6E45-4843-A923-466C771130F0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{1FC77AA5-333D-448C-AF0B-60EAA490CA64}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1FC77AA5-333D-448C-AF0B-60EAA490CA64}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1FC77AA5-333D-448C-AF0B-60EAA490CA64}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3003265D-6E45-4843-A923-466C771130F0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3003265D-6E45-4843-A923-466C771130F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3003265D-6E45-4843-A923-466C771130F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3003265D-6E45-4843-A923-466C771130F0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
