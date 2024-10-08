@@ -1,5 +1,7 @@
 using eve_backend.data;
 using Microsoft.EntityFrameworkCore;
+using eve_backend.logic;
+using eve_backend.logic.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +11,8 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddScoped<IExcelService, ExcelService>();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
