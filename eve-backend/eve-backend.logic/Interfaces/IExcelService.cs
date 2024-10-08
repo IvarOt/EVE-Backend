@@ -1,5 +1,7 @@
 ﻿using eve_backend.logic.DTO;
+using eve_backend.logic.Models;
 using Microsoft.AspNetCore.Http;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +12,6 @@ namespace eve_backend.logic.Interfaces
 {
     public interface IExcelService
     {
-        Task<String> UploadExcel(IFormFile excelFile);
+        Task UploadExcel(IFormFile excelFile);
     }
 }

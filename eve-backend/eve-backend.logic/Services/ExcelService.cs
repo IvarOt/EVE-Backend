@@ -1,25 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using eve_backend.logic.Interfaces;
-using eve_backend.logic.DTO;
-using eve_backend.logic.Models;
-using System.Text.Json.Nodes;
-using System.Text.Json;
-using System.Xml;
-using System.ComponentModel;
+﻿using eve_backend.logic.Interfaces;
 using OfficeOpenXml;
 using Newtonsoft.Json;
 using Microsoft.AspNetCore.Http;
 using LicenseContext = OfficeOpenXml.LicenseContext;
 using Formatting = Newtonsoft.Json.Formatting;
+using Newtonsoft.Json.Linq;
+using eve_backend.logic.Models;
 
-namespace eve_backend.logic
+namespace eve_backend.logic.Services
 {
     public class ExcelService : IExcelService
     {
+        private readonly IExcelRepository _excelRepository;
+        public ExcelService(IExcelRepository excelRepository)
+        {
+            _excelRepository = excelRepository;
+        }
+
         private async Task<string> GetJsonFromExcelBasic(IFormFile file)
         {
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
@@ -58,16 +55,28 @@ namespace eve_backend.logic
             return jsonData;
         }
 
-        public async Task<String> UploadExcel(IFormFile excelFile)
+        public async Task UploadExcel(IFormFile excelFile)
         {
             string json = await GetJsonFromExcelBasic(excelFile);
+            var jsonArray = JArray.Parse(json);
 
-            dynamic model = new DynamicModel();
+            ExcelFile file = new ExcelFile();
 
-            model.rewerwerwer = "werwerwer";
+            foreach ( var item in jsonArray )
+            {
+                ExcelObject excelObject = new ExcelObject();
 
-            return json;
-         
+                foreach ( var property in item.Children<JProperty>() )
+                {
+                    ExcelProperty excelProperty = new ExcelProperty();
+                    excelProperty.Name = property.Name;
+                    excelProperty.Value = property.Value.ToString();
+                    excelObject.ExcelProperties.Add(excelProperty);
+                }
+                file.excelObjects.Add(excelObject);
+            }
+            file.Name = excelFile.FileName;
+            await _excelRepository.SaveExcelFile(file);
         }
     }
 }

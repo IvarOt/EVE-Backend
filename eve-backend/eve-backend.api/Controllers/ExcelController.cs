@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using eve_backend.logic.Interfaces;
-namespace eve_backend.api
+using System.Text.Json;
+using Newtonsoft.Json.Linq;
+namespace eve_backend.api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -17,10 +19,15 @@ namespace eve_backend.api
         [HttpPost]
         public async Task<IActionResult> Post(IFormFile file)
         {
-            string strin2g = await _excelService.UploadExcel(file);
-            
-
-            return Ok(strin2g);
+            await _excelService.UploadExcel(file);
+            return Ok();
         }
+
+        [HttpDelete]
+        public async Task<IActionResult> Delete(int id)
+        {
+            return Ok();
+        }
+
     }
 }

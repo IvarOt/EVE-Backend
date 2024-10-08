@@ -1,7 +1,8 @@
 using eve_backend.data;
 using Microsoft.EntityFrameworkCore;
-using eve_backend.logic;
 using eve_backend.logic.Interfaces;
+using eve_backend.logic.Services;
+using eve_backend.data.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,11 +14,12 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<IExcelService, ExcelService>();
+builder.Services.AddScoped<IExcelRepository, ExcelRepository>();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     var connectionstring = builder.Configuration.GetConnectionString("DefaultConnection");
-    options.UseSqlServer(connectionstring);
+    options.UseSqlServer(connectionstring, b => b.MigrationsAssembly("eve-backend.api"));
 });
 var app = builder.Build();
 
