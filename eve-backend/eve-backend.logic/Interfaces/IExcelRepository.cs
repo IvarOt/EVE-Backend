@@ -10,5 +10,7 @@ namespace eve_backend.logic.Interfaces
     public interface IExcelRepository
     {
         Task SaveExcelFile(ExcelFile file);
+
+        Task DeleteExcelFile(int id);
     }
 }

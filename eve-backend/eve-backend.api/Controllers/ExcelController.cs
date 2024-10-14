@@ -26,6 +26,7 @@ namespace eve_backend.api.Controllers
         [HttpDelete]
         public async Task<IActionResult> Delete(int id)
         {
+            await _excelService.DeleteExcel(id);
             return Ok();
         }
 

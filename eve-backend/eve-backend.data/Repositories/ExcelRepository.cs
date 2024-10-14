@@ -16,5 +16,12 @@ namespace eve_backend.data.Repositories
             await _context.ExcelFiles.AddAsync(file);
             await _context.SaveChangesAsync();
         }
+
+        public async Task DeleteExcelFile(int id)
+        {
+            var file = await _context.ExcelFiles.FindAsync(id);
+            _context.ExcelFiles.Remove(file);
+            await _context.SaveChangesAsync();
+        }
     }
 }

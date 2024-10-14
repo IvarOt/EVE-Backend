@@ -10,5 +10,18 @@ namespace eve_backend.data
 		public DbSet<ExcelFile> ExcelFiles { get; set; }
 		public DbSet<ExcelProperty> ExcelProperties { get; set; }
 		public ApplicationDbContext(DbContextOptions<ApplicationDbContext>options) : base(options) { }
-	}
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<ExcelFile>()
+                .HasMany(ef => ef.excelObjects)
+                .WithOne()
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<ExcelObject>()
+                .HasMany(eo => eo.ExcelProperties)
+                .WithOne()
+                .OnDelete(DeleteBehavior.Cascade);
+        }
+
+    }
 }

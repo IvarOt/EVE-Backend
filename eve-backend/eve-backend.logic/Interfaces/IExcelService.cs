@@ -13,5 +13,7 @@ namespace eve_backend.logic.Interfaces
     public interface IExcelService
     {
         Task UploadExcel(IFormFile excelFile);
+
+        Task DeleteExcel(int id);
     }
 }

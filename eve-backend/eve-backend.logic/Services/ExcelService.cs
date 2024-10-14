@@ -78,5 +78,10 @@ namespace eve_backend.logic.Services
             file.Name = excelFile.FileName;
             await _excelRepository.SaveExcelFile(file);
         }
+
+        public async Task DeleteExcel(int id)
+        {
+            await _excelRepository.DeleteExcelFile(id);
+        }
     }
 }
