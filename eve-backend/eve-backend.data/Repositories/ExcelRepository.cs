@@ -20,15 +20,29 @@ namespace eve_backend.data.Repositories
         public async Task DeleteExcelFile(int id)
         {
             var file = await _context.ExcelFiles.FindAsync(id);
-            _context.ExcelFiles.Remove(file);
-            await _context.SaveChangesAsync();
+            if (file == null)
+            {
+                throw new FileNotFoundException();
+            }
+            else
+            {
+                _context.ExcelFiles.Remove(file);
+                await _context.SaveChangesAsync();
+            }
         }
 
         public async Task UpdateExcelFile(int id, string fileName)
         {
             var file = await _context.ExcelFiles.FindAsync(id);
-            file.Name = fileName;
-            await _context.SaveChangesAsync();
+            if (file == null)
+            {
+                throw new FileNotFoundException();
+            }
+            else
+            {
+                file.Name = fileName;
+                await _context.SaveChangesAsync();
+            }
         }
     }
 }

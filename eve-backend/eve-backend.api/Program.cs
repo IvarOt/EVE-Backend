@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using eve_backend.logic.Interfaces;
 using eve_backend.logic.Services;
 using eve_backend.data.Repositories;
+using eve_backend.logic;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,6 +27,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionstring, b => b.MigrationsAssembly("eve-backend.api"));
 });
 var app = builder.Build();
+
+app.UseMiddleware<ExceptionMiddleware>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
