@@ -30,5 +30,12 @@ namespace eve_backend.api.Controllers
             return Ok();
         }
 
+        [HttpPut]
+        public async Task<IActionResult> Put(int id, string fileName)
+        {
+            await _excelService.UpdateExcel(id, fileName);
+            return Ok();
+        }
+
     }
 }

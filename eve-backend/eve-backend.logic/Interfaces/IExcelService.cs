@@ -15,5 +15,7 @@ namespace eve_backend.logic.Interfaces
         Task UploadExcel(IFormFile excelFile);
 
         Task DeleteExcel(int id);
+
+        Task UpdateExcel(int id, string fileName);
     }
 }
