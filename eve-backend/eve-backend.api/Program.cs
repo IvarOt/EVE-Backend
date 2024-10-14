@@ -15,6 +15,10 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<IExcelService, ExcelService>();
 builder.Services.AddScoped<IExcelRepository, ExcelRepository>();
+builder.Services.AddScoped<IPropertyRepository, PropertyRepository>();
+builder.Services.AddScoped<IPropertyService, PropertyService>();
+builder.Services.AddScoped<IObjectRepository, ObjectRepository>();
+builder.Services.AddScoped<IObjectService, ObjectService>();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
