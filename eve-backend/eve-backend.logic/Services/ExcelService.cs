@@ -76,6 +76,7 @@ namespace eve_backend.logic.Services
                 file.excelObjects.Add(excelObject);
             }
             file.Name = excelFile.FileName;
+            file.LastUpdated = DateTime.Now;
             await _excelRepository.SaveExcelFile(file);
         }
 
@@ -86,7 +87,8 @@ namespace eve_backend.logic.Services
 
         public async Task UpdateExcel(int id, string fileName)
         {
-            await _excelRepository.UpdateExcelFile(id, fileName);
+            var LastUpdated = DateTime.Now;
+            await _excelRepository.UpdateExcelFile(id, fileName, LastUpdated);
         }
 
         public async Task<List<ExcelFile>> GetExcelFiles()
