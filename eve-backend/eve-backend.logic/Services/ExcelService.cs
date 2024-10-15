@@ -88,5 +88,11 @@ namespace eve_backend.logic.Services
         {
             await _excelRepository.UpdateExcelFile(id, fileName);
         }
+
+        public async Task<List<ExcelFile>> GetExcelFiles()
+        {
+            var files = await _excelRepository.GetExcelFiles();
+            return files;
+        }
     }
 }

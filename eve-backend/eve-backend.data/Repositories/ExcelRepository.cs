@@ -11,6 +11,12 @@ namespace eve_backend.data.Repositories
             _context = applicationDbContext;
         }
 
+        public async Task<List<ExcelFile>> GetExcelFiles()
+        {
+            var files = _context.ExcelFiles.ToList();
+            return files;
+        }
+
         public async Task SaveExcelFile(ExcelFile file)
         {
             await _context.ExcelFiles.AddAsync(file);
@@ -31,7 +37,7 @@ namespace eve_backend.data.Repositories
             }
         }
 
-        public async Task UpdateExcelFile(int id, string fileName)
+        public async Task UpdateExcelFile(int id, string fileName, DateTime lastUpdated)
         {
             var file = await _context.ExcelFiles.FindAsync(id);
             if (file == null)
@@ -41,6 +47,7 @@ namespace eve_backend.data.Repositories
             else
             {
                 file.Name = fileName;
+                file.LastUpdated = lastUpdated;
                 await _context.SaveChangesAsync();
             }
         }

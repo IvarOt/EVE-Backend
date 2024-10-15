@@ -16,6 +16,13 @@ namespace eve_backend.api.Controllers
             _excelService = excelService;
         }
 
+        [HttpGet]
+        public async Task<IActionResult> Get()
+        {
+            var files = await _excelService.GetExcelFiles();
+            return Ok(files);
+        }
+
         [HttpPost]
         public async Task<IActionResult> Post(IFormFile file)
         {
