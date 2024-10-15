@@ -21,5 +21,10 @@ namespace eve_backend.logic.Services
             var properties = await _propertyRepository.GetProperties(objectId);
             return properties;
         }
+
+        public async Task UpdateProperty(int propertyId, string value)
+        {
+            await _propertyRepository.UpdateProperty(propertyId, value);
+        }
     }
 }

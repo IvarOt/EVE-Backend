@@ -10,5 +10,7 @@ namespace eve_backend.logic.Interfaces
     public interface IPropertyRepository
     {
         Task<List<ExcelProperty>> GetProperties(int objectId);
+
+        Task UpdateProperty(int propertyId, string value);
     }
 }

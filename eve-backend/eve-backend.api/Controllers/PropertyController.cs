@@ -1,6 +1,7 @@
 ﻿using eve_backend.logic.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Identity.Client;
 
 namespace eve_backend.api.Controllers
 {
@@ -25,8 +26,9 @@ namespace eve_backend.api.Controllers
             return Ok();
         }
         [HttpPut]
-        public async Task<IActionResult> Put()
+        public async Task<IActionResult> Put(int PropertyId, string Value)
         {
+            await _propertyService.UpdateProperty(PropertyId, Value);
             return Ok();
         }
         [HttpDelete]

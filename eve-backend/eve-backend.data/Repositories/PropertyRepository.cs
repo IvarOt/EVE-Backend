@@ -22,5 +22,12 @@ namespace eve_backend.data.Repositories
             var properties = await _context.ExcelProperties.Where(x => x.ExcelObjectId == objectId).ToListAsync();
             return properties;
         }
+
+        public async Task UpdateProperty(int propertyId, string value)
+        {
+            var property = await _context.ExcelProperties.FirstOrDefaultAsync(x => x.Id == propertyId);
+            property.Value = value;
+            await _context.SaveChangesAsync();
+        }
     }
 }
