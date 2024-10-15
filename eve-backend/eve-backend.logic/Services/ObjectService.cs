@@ -1,4 +1,5 @@
 ﻿using eve_backend.logic.Interfaces;
+using eve_backend.logic.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,5 +15,11 @@ namespace eve_backend.logic.Services
         {
             _objectRepository = objectRepository;
         }
+        public async Task<List<ExcelObject>> GetObjects(int id)
+        {
+            var objects = await _objectRepository.GetObjects(id);
+            return objects;
+        }
+
     }
 }

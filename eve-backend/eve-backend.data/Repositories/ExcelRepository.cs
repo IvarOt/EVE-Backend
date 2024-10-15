@@ -1,5 +1,6 @@
 ﻿using eve_backend.logic.Interfaces;
 using eve_backend.logic.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace eve_backend.data.Repositories
 {
@@ -13,7 +14,7 @@ namespace eve_backend.data.Repositories
 
         public async Task<List<ExcelFile>> GetExcelFiles()
         {
-            var files = _context.ExcelFiles.ToList();
+            var files = await _context.ExcelFiles.ToListAsync();
             return files;
         }
 

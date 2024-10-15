@@ -20,8 +20,16 @@ builder.Services.AddScoped<IPropertyRepository, PropertyRepository>();
 builder.Services.AddScoped<IPropertyService, PropertyService>();
 builder.Services.AddScoped<IObjectRepository, ObjectRepository>();
 builder.Services.AddScoped<IObjectService, ObjectService>();
-
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: "EVE",
+        builder =>
+        {
+            builder.AllowAnyOrigin()
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+        });
+}); builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     var connectionstring = builder.Configuration.GetConnectionString("DefaultConnection");
     options.UseSqlServer(connectionstring, b => b.MigrationsAssembly("eve-backend.api"));
@@ -36,7 +44,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
+app.UseCors("EVE");
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
