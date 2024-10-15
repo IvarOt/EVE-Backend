@@ -1,4 +1,5 @@
-﻿using System;
+﻿using eve_backend.logic.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,5 +9,6 @@ namespace eve_backend.logic.Interfaces
 {
     public interface IPropertyRepository
     {
+        Task<List<ExcelProperty>> GetProperties(int objectId);
     }
 }

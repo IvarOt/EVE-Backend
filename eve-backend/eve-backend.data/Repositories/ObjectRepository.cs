@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace eve_backend.data.Repositories
 {
-    public class ObjectRepository: IObjectRepository
+    public class ObjectRepository : IObjectRepository
     {
         private readonly ApplicationDbContext _context;
 
@@ -19,7 +19,10 @@ namespace eve_backend.data.Repositories
         }
         public async Task<List<ExcelObject>> GetObjects(int id)
         {
-            var objects = await _context.ExcelObjects.Include(x => x.ExcelProperties).Where(x => x.Id == id).ToListAsync();
+            var objects = await _context.ExcelObjects
+                .Include(x => x.ExcelProperties)
+                .Where(x => x.ExcelFileId == id)
+                .ToListAsync();
             return objects;
         }
 

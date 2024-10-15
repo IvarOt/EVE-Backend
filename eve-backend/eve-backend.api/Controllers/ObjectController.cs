@@ -20,19 +20,19 @@ namespace eve_backend.api.Controllers
             return Ok(objects);
         }
         [HttpPost]
-        public async Task<IActionResult> Post()
+        public async Task<IActionResult> Post([FromRoute] int ExcelId)
         {
 
             return Ok();
         }
         [HttpPut]
-        public async Task<IActionResult> Put()
+        public async Task<IActionResult> Put([FromRoute] int ExcelId)
         {
 
             return Ok();
         }
         [HttpDelete]
-        public async Task<IActionResult> Delete()
+        public async Task<IActionResult> Delete([FromRoute] int ExcelId)
         {
 
             return Ok();

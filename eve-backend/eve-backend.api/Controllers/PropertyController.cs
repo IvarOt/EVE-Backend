@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace eve_backend.api.Controllers
 {
-    [Route("api/excel/{Excelid}/object/{Objectid}/property/")]
+    [Route("api/Excel/{ExcelId}/Object/{ObjectId}/Property/")]
     [ApiController]
     public class PropertyController : ControllerBase
     {
@@ -14,9 +14,10 @@ namespace eve_backend.api.Controllers
             _propertyService = propertyService;
         }
         [HttpGet]
-        public async Task<IActionResult> Get()
+        public async Task<IActionResult> Get([FromRoute] int ObjectId)
         {
-            return Ok();
+            var properties = await _propertyService.GetProperties(ObjectId);
+            return Ok(properties);
         }
         [HttpPost]
         public async Task<IActionResult> Post()

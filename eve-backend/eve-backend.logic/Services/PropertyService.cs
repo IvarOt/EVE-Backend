@@ -1,4 +1,5 @@
 ﻿using eve_backend.logic.Interfaces;
+using eve_backend.logic.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +14,12 @@ namespace eve_backend.logic.Services
         public PropertyService (IPropertyRepository propertyRepository)
         {
             _propertyRepository = propertyRepository;
+        }
+
+        public async Task<List<ExcelProperty>> GetProperties(int objectId)
+        {
+            var properties = await _propertyRepository.GetProperties(objectId);
+            return properties;
         }
     }
 }
