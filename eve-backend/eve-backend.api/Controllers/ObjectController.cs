@@ -22,21 +22,14 @@ namespace eve_backend.api.Controllers
         [HttpPost]
         public async Task<IActionResult> Post([FromRoute] int ExcelId)
         {
-
-            return Ok();
-        }
-        [HttpPut]
-        public async Task<IActionResult> Put([FromRoute] int ExcelId)
-        {
-
+            await _objectService.CreateObject(ExcelId);
             return Ok();
         }
         [HttpDelete]
-        public async Task<IActionResult> Delete([FromRoute] int ExcelId)
+        public async Task<IActionResult> Delete(int objectId)
         {
-
+            await _objectService.DeleteObject(objectId);
             return Ok();
         }
-
     }
 }

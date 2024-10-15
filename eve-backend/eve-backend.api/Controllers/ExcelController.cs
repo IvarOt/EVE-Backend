@@ -43,8 +43,5 @@ namespace eve_backend.api.Controllers
             await _excelService.UpdateExcel(id, fileName);
             return Ok();
         }
-
-
     }
-    
 }

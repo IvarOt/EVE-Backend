@@ -15,10 +15,32 @@ namespace eve_backend.logic.Services
         {
             _objectRepository = objectRepository;
         }
-        public async Task<List<ExcelObject>> GetObjects(int id)
+        public async Task<List<ExcelObject>> GetObjects(int excelId)
         {
-            var objects = await _objectRepository.GetObjects(id);
+            var objects = await _objectRepository.GetObjects(excelId);
             return objects;
+        }
+
+        public async Task UpdateObject(int objectId)
+        {
+            await _objectRepository.UpdateObject(objectId, DateTime.Now);
+        }
+
+        public async Task DeleteObject(int objectId)
+        {
+            await _objectRepository.DeleteObject(objectId);
+        }
+        public async Task CreateObject(int fileId)
+        {
+            ExcelObject firstObject = await _objectRepository.GetFirstObject(fileId);
+            ExcelObject newObject = new ExcelObject();
+            foreach (var property in firstObject.ExcelProperties)
+            {
+                newObject.ExcelProperties.Add(new ExcelProperty { Name = property.Name, Value = "" });
+            }
+            newObject.LastUpdated = DateTime.Now;
+            newObject.ExcelFileId = fileId;
+            await _objectRepository.CreateObject(newObject);
         }
 
     }

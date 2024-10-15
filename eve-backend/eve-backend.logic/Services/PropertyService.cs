@@ -11,9 +11,11 @@ namespace eve_backend.logic.Services
     public class PropertyService: IPropertyService
     {
         private readonly IPropertyRepository _propertyRepository;
-        public PropertyService (IPropertyRepository propertyRepository)
+        private readonly IObjectService _objectService;
+        public PropertyService (IPropertyRepository propertyRepository, IObjectService objectService)
         {
             _propertyRepository = propertyRepository;
+            _objectService = objectService;
         }
 
         public async Task<List<ExcelProperty>> GetProperties(int objectId)
@@ -22,9 +24,10 @@ namespace eve_backend.logic.Services
             return properties;
         }
 
-        public async Task UpdateProperty(int propertyId, string value)
+        public async Task UpdateProperty(int objectId, int propertyId, string value)
         {
             await _propertyRepository.UpdateProperty(propertyId, value);
+            await _objectService.UpdateObject(objectId);
         }
     }
 }

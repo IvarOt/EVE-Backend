@@ -20,14 +20,28 @@ namespace eve_backend.data.Repositories
         public async Task<List<ExcelProperty>> GetProperties(int objectId)
         {
             var properties = await _context.ExcelProperties.Where(x => x.ExcelObjectId == objectId).ToListAsync();
-            return properties;
+            if (properties == null)
+            {
+                throw new FileNotFoundException();
+            }
+            else
+            {
+                return properties;
+            }
         }
 
         public async Task UpdateProperty(int propertyId, string value)
         {
             var property = await _context.ExcelProperties.FirstOrDefaultAsync(x => x.Id == propertyId);
-            property.Value = value;
-            await _context.SaveChangesAsync();
+            if (property == null)
+            {
+                throw new FileNotFoundException();
+            }
+            else
+            {
+                property.Value = value;
+                await _context.SaveChangesAsync();
+            }
         }
     }
 }

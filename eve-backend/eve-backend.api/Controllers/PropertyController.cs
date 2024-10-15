@@ -20,20 +20,10 @@ namespace eve_backend.api.Controllers
             var properties = await _propertyService.GetProperties(ObjectId);
             return Ok(properties);
         }
-        [HttpPost]
-        public async Task<IActionResult> Post()
-        {
-            return Ok();
-        }
         [HttpPut]
-        public async Task<IActionResult> Put(int PropertyId, string Value)
+        public async Task<IActionResult> Put([FromRoute] int ObjectId, int PropertyId, string Value)
         {
-            await _propertyService.UpdateProperty(PropertyId, Value);
-            return Ok();
-        }
-        [HttpDelete]
-        public async Task<IActionResult> Delete()
-        {
+            await _propertyService.UpdateProperty(ObjectId, PropertyId, Value);
             return Ok();
         }
     }
