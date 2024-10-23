@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace eve_backend.api.Controllers
 {
-    [Route("api/Excel/{ExcelId}/Object/")]
+    [Route("api/[controller]")]
     [ApiController]
     public class ObjectController : ControllerBase
     {
@@ -13,22 +13,22 @@ namespace eve_backend.api.Controllers
         {
             _objectService = objectService;
         }
-        [HttpGet]
-        public async Task<IActionResult> Get([FromRoute] int ExcelId)
+        [HttpGet("{ExcelId}")]
+        public async Task<IActionResult> Get(int ExcelId)
         {
             var objects = await _objectService.GetObjects(ExcelId);
             return Ok(objects);
         }
-        [HttpPost]
-        public async Task<IActionResult> Post([FromRoute] int ExcelId)
+        [HttpPost("{ExcelId}")]
+        public async Task<IActionResult> Post(int ExcelId)
         {
             await _objectService.CreateObject(ExcelId);
             return Ok();
         }
-        [HttpDelete]
-        public async Task<IActionResult> Delete(int objectId)
+        [HttpDelete("{ObjectId}")]
+        public async Task<IActionResult> Delete(int ObjectId)
         {
-            await _objectService.DeleteObject(objectId);
+            await _objectService.DeleteObject(ObjectId);
             return Ok();
         }
     }
