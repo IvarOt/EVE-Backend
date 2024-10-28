@@ -52,5 +52,15 @@ namespace eve_backend.data.Repositories
                 await _context.SaveChangesAsync();
             }
         }
+
+        public async Task<ObjectStructure> GetFileObjectStructure(int fileId)
+        {
+            ObjectStructure structure = await _context.ExcelFiles.Where(x => x.Id == fileId).Select(x => x.Structure).FirstOrDefaultAsync();
+            if (structure == null)
+            {
+                throw new FileNotFoundException();
+            }
+            return structure;
+        }
     }
 }

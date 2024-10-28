@@ -12,15 +12,15 @@ using eve_backend.data;
 namespace eve_backend.api.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241008131809_add-excel-properties")]
-    partial class addexcelproperties
+    [Migration("20241028091431_initialCreate")]
+    partial class initialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.8")
+                .HasAnnotation("ProductVersion", "8.0.10")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -28,14 +28,17 @@ namespace eve_backend.api.Migrations
             modelBuilder.Entity("eve_backend.logic.Models.ExcelFile", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    b.Property<DateTime>("LastUpdated")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("StructureId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -50,8 +53,11 @@ namespace eve_backend.api.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("ExcelFileId")
+                    b.Property<int>("ExcelFileId")
                         .HasColumnType("int");
+
+                    b.Property<DateTime>("LastUpdated")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
@@ -68,7 +74,7 @@ namespace eve_backend.api.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("ExcelObjectId")
+                    b.Property<int>("ExcelObjectId")
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
@@ -86,18 +92,50 @@ namespace eve_backend.api.Migrations
                     b.ToTable("ExcelProperties");
                 });
 
+            modelBuilder.Entity("eve_backend.logic.Models.ObjectStructure", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Headers")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ObjectStructure");
+                });
+
+            modelBuilder.Entity("eve_backend.logic.Models.ExcelFile", b =>
+                {
+                    b.HasOne("eve_backend.logic.Models.ObjectStructure", "Structure")
+                        .WithOne()
+                        .HasForeignKey("eve_backend.logic.Models.ExcelFile", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Structure");
+                });
+
             modelBuilder.Entity("eve_backend.logic.Models.ExcelObject", b =>
                 {
                     b.HasOne("eve_backend.logic.Models.ExcelFile", null)
                         .WithMany("excelObjects")
-                        .HasForeignKey("ExcelFileId");
+                        .HasForeignKey("ExcelFileId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("eve_backend.logic.Models.ExcelProperty", b =>
                 {
                     b.HasOne("eve_backend.logic.Models.ExcelObject", null)
                         .WithMany("ExcelProperties")
-                        .HasForeignKey("ExcelObjectId");
+                        .HasForeignKey("ExcelObjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("eve_backend.logic.Models.ExcelFile", b =>

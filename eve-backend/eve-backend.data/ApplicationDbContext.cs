@@ -4,12 +4,13 @@ using Microsoft.Identity.Client;
 
 namespace eve_backend.data
 {
-	public class ApplicationDbContext : DbContext
-	{
-		public DbSet<ExcelObject> ExcelObjects { get; set; }
-		public DbSet<ExcelFile> ExcelFiles { get; set; }
-		public DbSet<ExcelProperty> ExcelProperties { get; set; }
-		public ApplicationDbContext(DbContextOptions<ApplicationDbContext>options) : base(options) { }
+    public class ApplicationDbContext : DbContext
+    {
+        public DbSet<ExcelObject> ExcelObjects { get; set; }
+        public DbSet<ExcelFile> ExcelFiles { get; set; }
+        public DbSet<ExcelProperty> ExcelProperties { get; set; }
+        public DbSet<ObjectStructure> ObjectStructure { get; set; }
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<ExcelFile>()
@@ -20,6 +21,11 @@ namespace eve_backend.data
             modelBuilder.Entity<ExcelObject>()
                 .HasMany(eo => eo.ExcelProperties)
                 .WithOne()
+                .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<ExcelFile>()
+                .HasOne(eo => eo.Structure)
+                .WithOne()
+                .HasForeignKey<ExcelFile>(ef => ef.Id)
                 .OnDelete(DeleteBehavior.Cascade);
         }
     }

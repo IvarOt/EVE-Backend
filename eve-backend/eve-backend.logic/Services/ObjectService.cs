@@ -10,11 +10,14 @@ namespace eve_backend.logic.Services
 {
     public class ObjectService : IObjectService
     {
-        readonly IObjectRepository _objectRepository;
-        public ObjectService(IObjectRepository objectRepository)
+        private readonly IObjectRepository _objectRepository;
+        private readonly IExcelRepository _excelRepository;
+        public ObjectService(IObjectRepository objectRepository, IExcelRepository excelRepository)
         {
             _objectRepository = objectRepository;
+            _excelRepository = excelRepository;
         }
+
         public async Task<List<ExcelObject>> GetObjects(int excelId)
         {
             var objects = await _objectRepository.GetObjects(excelId);
@@ -32,11 +35,11 @@ namespace eve_backend.logic.Services
         }
         public async Task CreateObject(int fileId)
         {
-            ExcelObject firstObject = await _objectRepository.GetFirstObject(fileId);
+            ObjectStructure structure = await _excelRepository.GetFileObjectStructure(fileId);
             ExcelObject newObject = new ExcelObject();
-            foreach (var property in firstObject.ExcelProperties)
+            foreach (var item in structure.Headers)
             {
-                newObject.ExcelProperties.Add(new ExcelProperty { Name = property.Name, Value = "" });
+                newObject.ExcelProperties.Add(new ExcelProperty { Name = item, Value = "" });
             }
             newObject.LastUpdated = DateTime.Now;
             newObject.ExcelFileId = fileId;

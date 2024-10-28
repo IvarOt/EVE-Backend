@@ -10,7 +10,6 @@ namespace eve_backend.logic.Interfaces
     public interface IObjectRepository
     {
         Task<List<ExcelObject>> GetObjects(int id);
-        Task<ExcelObject> GetFirstObject(int fileId);
         Task CreateObject(ExcelObject excelObject);
         Task UpdateObject(int objectId, DateTime dateTime);
         Task DeleteObject(int objectId);
