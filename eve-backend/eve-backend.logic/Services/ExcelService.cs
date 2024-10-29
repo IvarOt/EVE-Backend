@@ -38,14 +38,26 @@ namespace eve_backend.logic.Services
                         headers.Add(worksheet.Cells[1, col].Text);
                     }
 
-                    for (int row = 2; row <= rowCount; row++)
+                    if (rowCount == 1)
                     {
                         var rowData = new Dictionary<string, object>();
                         for (int col = 1; col <= colCount; col++)
                         {
-                            rowData[headers[col - 1]] = worksheet.Cells[row, col].Text;
+                            rowData[headers[col - 1]] = "";
+                            rows.Add(rowData);
                         }
-                        rows.Add(rowData);
+                    }
+                    else
+                    {
+                        for (int row = 2; row <= rowCount; row++)
+                        {
+                            var rowData = new Dictionary<string, object>();
+                            for (int col = 1; col <= colCount; col++)
+                            {
+                                rowData[headers[col - 1]] = worksheet.Cells[row, col].Text;
+                            }
+                            rows.Add(rowData);
+                        }
                     }
 
                     jsonData = JsonConvert.SerializeObject(rows, Formatting.Indented);
@@ -61,17 +73,24 @@ namespace eve_backend.logic.Services
             var jsonArray = JArray.Parse(json);
 
             ExcelFile file = new ExcelFile();
+            var jsonItem = jsonArray.FirstOrDefault();
 
-            foreach ( var item in jsonArray )
+            foreach (var property in jsonItem.Children<JProperty>())
+            {
+                file.Structure.Headers.Add(property.Name);
+            }
+
+            foreach (var item in jsonArray)
             {
                 ExcelObject excelObject = new ExcelObject();
 
-                foreach ( var property in item.Children<JProperty>() )
+                foreach (var property in item.Children<JProperty>())
                 {
                     ExcelProperty excelProperty = new ExcelProperty();
                     excelProperty.Name = property.Name;
                     excelProperty.Value = property.Value.ToString();
                     excelObject.ExcelProperties.Add(excelProperty);
+                    excelObject.LastUpdated = DateTime.Now;
                 }
                 file.excelObjects.Add(excelObject);
             }

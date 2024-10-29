@@ -16,5 +16,6 @@ namespace eve_backend.logic.Interfaces
         Task UpdateExcelFile(int id, string fileName, DateTime LastUpdated);
 
         Task<List<ExcelFile>> GetExcelFiles();
+        Task<ObjectStructure> GetFileObjectStructure(int fileId);
     }
 }

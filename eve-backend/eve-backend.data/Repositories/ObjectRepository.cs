@@ -23,19 +23,6 @@ namespace eve_backend.data.Repositories
             return objects;
         }
 
-        public async Task<ExcelObject> GetFirstObject(int fileId)
-        {
-            var firstObject = await _context.ExcelObjects.Include(x => x.ExcelProperties).Where(x => x.ExcelFileId == fileId).FirstOrDefaultAsync();
-            if (firstObject == null)
-            {
-                throw new FileNotFoundException();
-            }
-            else
-            {
-                return firstObject;
-            }
-        }
-
         public async Task UpdateObject(int objectId, DateTime dateTime)
         {
             var objectToUpdate = await _context.ExcelObjects.Where(x => x.Id == objectId).FirstOrDefaultAsync();
