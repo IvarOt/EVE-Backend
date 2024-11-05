@@ -17,10 +17,13 @@ namespace eve_backend.data.Repositories
         {
             _context = context;
         }
-        public async Task<List<ExcelObject>> GetObjects(int excelId)
+        public async Task<List<ExcelObject>> GetObjects(int page, int pagesize, bool isDescending, int excelId)
         {
-            var objects = await _context.ExcelObjects.Include(x => x.ExcelProperties).Where(x => x.ExcelFileId == excelId).ToListAsync();
-            return objects;
+            page = pagesize * page;
+            return isDescending
+                ? await _context.ExcelObjects.Include(x => x.ExcelProperties).Where(x => x.ExcelFileId == excelId).OrderByDescending(x => x.LastUpdated).Skip(page).Take(pagesize).ToListAsync()
+                : await _context.ExcelObjects.Include(x => x.ExcelProperties).Where(x => x.ExcelFileId == excelId).OrderBy(x => x.LastUpdated).Skip(page).Take(pagesize).ToListAsync();
+
         }
 
         public async Task UpdateObject(int objectId, DateTime dateTime)
