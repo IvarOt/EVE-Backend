@@ -22,9 +22,15 @@ namespace eve_backend.data.Repositories
                 searchTerm = "";
             }
             page = page * pagesize;
-            return isDescending
+            var result =  isDescending
             ? await _context.ExcelFiles.OrderByDescending(b => b.LastUpdated).Where(b => b.Name.Contains(searchTerm)).Skip(page).Take(pagesize).ToListAsync()
             : await _context.ExcelFiles.OrderBy(b => b.LastUpdated).Where(b => b.Name.Contains(searchTerm)).Skip(page).Take(pagesize).ToListAsync();
+
+            if (result == null)
+            {
+                throw new FileNotFoundException();
+            }
+            return result;
         }
 
         public async Task<List<ExcelFile>> GetExcelFilesAZ(int page, int pagesize, bool isDescending, string searchTerm)
@@ -34,9 +40,15 @@ namespace eve_backend.data.Repositories
                 searchTerm = "";
             }
             page = page * pagesize;
-            return isDescending
+            var result = isDescending
             ? await _context.ExcelFiles.OrderByDescending(b => b.Name).Where(b => b.Name.Contains(searchTerm)).Skip(page).Take(pagesize).ToListAsync()
             : await _context.ExcelFiles.OrderBy(b => b.Name).Where(b => b.Name.Contains(searchTerm)).Skip(page).Take(pagesize).ToListAsync();
+
+            if (result == null)
+            {
+                throw new FileNotFoundException();
+            }
+            return result;
         }
 
         public async Task SaveExcelFile(ExcelFile file)
