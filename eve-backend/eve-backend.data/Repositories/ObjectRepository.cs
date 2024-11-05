@@ -20,9 +20,16 @@ namespace eve_backend.data.Repositories
         public async Task<List<ExcelObject>> GetObjects(int page, int pagesize, bool isDescending, int excelId)
         {
             page = pagesize * page;
-            return isDescending
+            var result =  isDescending
                 ? await _context.ExcelObjects.Include(x => x.ExcelProperties).Where(x => x.ExcelFileId == excelId).OrderByDescending(x => x.LastUpdated).Skip(page).Take(pagesize).ToListAsync()
                 : await _context.ExcelObjects.Include(x => x.ExcelProperties).Where(x => x.ExcelFileId == excelId).OrderBy(x => x.LastUpdated).Skip(page).Take(pagesize).ToListAsync();
+
+
+            if (result == null)
+            {
+                throw new FileNotFoundException();
+            }
+            return result;
 
         }
 
