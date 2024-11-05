@@ -14,8 +14,8 @@ namespace eve_backend.logic.Interfaces
         Task DeleteExcelFile(int id);
 
         Task UpdateExcelFile(int id, string fileName, DateTime LastUpdated);
-
-        Task<List<ExcelFile>> GetExcelFiles();
+        Task<List<ExcelFile>> GetExcelFiles(int page, int pagesize, bool isDescending, string searchTerm);
+        Task<List<ExcelFile>> GetExcelFilesAZ(int page, int pagesize, bool isDescending, string searchTerm);
         Task<ObjectStructure> GetFileObjectStructure(int fileId);
     }
 }

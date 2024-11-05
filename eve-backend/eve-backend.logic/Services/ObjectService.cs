@@ -18,9 +18,9 @@ namespace eve_backend.logic.Services
             _excelRepository = excelRepository;
         }
 
-        public async Task<List<ExcelObject>> GetObjects(int excelId)
+        public async Task<List<ExcelObject>> GetObjects(int page, int pagesize, bool isDescending, int excelId)
         {
-            var objects = await _objectRepository.GetObjects(excelId);
+            var objects = await _objectRepository.GetObjects(page, pagesize, isDescending, excelId);
             return objects;
         }
 

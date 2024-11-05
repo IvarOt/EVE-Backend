@@ -17,9 +17,9 @@ namespace eve_backend.api.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Get()
+        public async Task<IActionResult> Get(int page, int pagesize, bool sortByDate, bool isDescending, string? searchTerm)
         {
-            var files = await _excelService.GetExcelFiles();
+            var files = await _excelService.GetExcelFiles(page, pagesize, sortByDate, isDescending, searchTerm);
             return Ok(files);
         }
 
