@@ -110,19 +110,19 @@ namespace eve_backend.logic.Services
             await _excelRepository.UpdateExcelFile(id, fileName, LastUpdated);
         }
 
-        public async Task<List<ExcelFile>> GetExcelFiles(int page, int pageSize, bool sortByDate, bool isDescending)
+        public async Task<List<ExcelFile>> GetExcelFiles(int page, int pageSize, bool sortByDate, bool isDescending, string searchTerm)
         {
             if (sortByDate)
             {
                 return isDescending
-                ? await _excelRepository.GetExcelFiles(page, pageSize, true)
-                : await _excelRepository.GetExcelFiles(page, pageSize, false);
+                ? await _excelRepository.GetExcelFiles(page, pageSize, true, searchTerm)
+                : await _excelRepository.GetExcelFiles(page, pageSize, false, searchTerm);
             }
             else
             {
                 return isDescending
-                ? await _excelRepository.GetExcelFilesAZ(page, pageSize, true)
-                : await _excelRepository.GetExcelFilesAZ(page, pageSize, false);
+                ? await _excelRepository.GetExcelFilesAZ(page, pageSize, true, searchTerm)
+                : await _excelRepository.GetExcelFilesAZ(page, pageSize, false, searchTerm);
             }
         }
     }

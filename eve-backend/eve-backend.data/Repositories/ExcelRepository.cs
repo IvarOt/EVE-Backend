@@ -2,6 +2,7 @@
 using eve_backend.logic.Interfaces;
 using eve_backend.logic.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using System.Drawing.Printing;
 
 namespace eve_backend.data.Repositories
@@ -14,20 +15,28 @@ namespace eve_backend.data.Repositories
             _context = applicationDbContext;
         }
 
-        public async Task<List<ExcelFile>> GetExcelFiles(int page, int pagesize, bool isDescending)
+        public async Task<List<ExcelFile>> GetExcelFiles(int page, int pagesize, bool isDescending, string searchTerm)
         {
+            if (searchTerm.IsNullOrEmpty())
+            {
+                searchTerm = "";
+            }
             page = page * pagesize;
             return isDescending
-            ? await _context.ExcelFiles.OrderByDescending(b => b.LastUpdated).Skip(page).Take(pagesize).ToListAsync()
-            : await _context.ExcelFiles.OrderBy(b => b.LastUpdated).Skip(page).Take(pagesize).ToListAsync();
+            ? await _context.ExcelFiles.OrderByDescending(b => b.LastUpdated).Where(b => b.Name.Contains(searchTerm)).Skip(page).Take(pagesize).ToListAsync()
+            : await _context.ExcelFiles.OrderBy(b => b.LastUpdated).Where(b => b.Name.Contains(searchTerm)).Skip(page).Take(pagesize).ToListAsync();
         }
 
-        public async Task<List<ExcelFile>> GetExcelFilesAZ(int page, int pagesize, bool isDescending)
+        public async Task<List<ExcelFile>> GetExcelFilesAZ(int page, int pagesize, bool isDescending, string searchTerm)
         {
+            if (searchTerm.IsNullOrEmpty())
+            {
+                searchTerm = "";
+            }
             page = page * pagesize;
             return isDescending
-            ? await _context.ExcelFiles.OrderByDescending(b => b.Name).Skip(page).Take(pagesize).ToListAsync()
-            : await _context.ExcelFiles.OrderBy(b => b.Name).Skip(page).Take(pagesize).ToListAsync();
+            ? await _context.ExcelFiles.OrderByDescending(b => b.Name).Where(b => b.Name.Contains(searchTerm)).Skip(page).Take(pagesize).ToListAsync()
+            : await _context.ExcelFiles.OrderBy(b => b.Name).Where(b => b.Name.Contains(searchTerm)).Skip(page).Take(pagesize).ToListAsync();
         }
 
         public async Task SaveExcelFile(ExcelFile file)
