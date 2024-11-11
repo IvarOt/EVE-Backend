@@ -156,5 +156,10 @@ namespace eve_backend.logic.Services
             return new ResponseExcelDownload { Stream = stream, FileName = file.Name, type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" };
             
         }   
+        public async Task<int> GetCount()
+        {
+            var result = await _excelRepository.GetCount();
+            return result;
+        }
     }
 }

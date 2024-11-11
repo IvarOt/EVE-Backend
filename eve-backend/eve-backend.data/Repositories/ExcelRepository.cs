@@ -51,6 +51,12 @@ namespace eve_backend.data.Repositories
             return result;
         }
 
+        public async Task<int> GetCount()
+        {
+            var result = await _context.ExcelFiles.CountAsync();
+            return result;
+        }
+
         public async Task SaveExcelFile(ExcelFile file)
         {
             await _context.ExcelFiles.AddAsync(file);

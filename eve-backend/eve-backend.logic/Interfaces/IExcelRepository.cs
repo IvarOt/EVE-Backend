@@ -18,5 +18,7 @@ namespace eve_backend.logic.Interfaces
         Task<List<ExcelFile>> GetExcelFilesAZ(int page, int pagesize, bool isDescending, string searchTerm);
         Task<ObjectStructure> GetFileObjectStructure(int fileId);
         Task<ExcelFile> GetExcelFile(int id);
+        Task<int> GetCount();
+
     }
 }

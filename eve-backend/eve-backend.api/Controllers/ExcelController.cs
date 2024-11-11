@@ -22,6 +22,12 @@ namespace eve_backend.api.Controllers
             var files = await _excelService.GetExcelFiles(page, pagesize, sortByDate, isDescending, searchTerm);
             return Ok(files);
         }
+        [HttpGet("Count")]
+        public async Task <IActionResult> Get()
+        {
+            var files = await _excelService.GetCount();
+            return Ok(files);
+        }
 
         [HttpPost]
         public async Task<IActionResult> Post(IFormFile file)
