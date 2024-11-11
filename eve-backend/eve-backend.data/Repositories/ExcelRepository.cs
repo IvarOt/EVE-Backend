@@ -95,5 +95,15 @@ namespace eve_backend.data.Repositories
             }
             return structure;
         }
+
+        public async Task<ExcelFile> GetExcelFile(int id)
+        {
+            var file = await _context.ExcelFiles.Include(x => x.excelObjects).ThenInclude(x => x.ExcelProperties).Include(x => x.Structure).Where(x => x.Id == id).FirstOrDefaultAsync();
+            if (file == null)
+            {
+                throw new FileNotFoundException();
+            }
+            return file;
+        }
     }
 }

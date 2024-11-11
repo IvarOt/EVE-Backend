@@ -6,6 +6,7 @@ using LicenseContext = OfficeOpenXml.LicenseContext;
 using Formatting = Newtonsoft.Json.Formatting;
 using Newtonsoft.Json.Linq;
 using eve_backend.logic.Models;
+using eve_backend.logic.DTO;
 
 namespace eve_backend.logic.Services
 {
@@ -125,5 +126,35 @@ namespace eve_backend.logic.Services
                 : await _excelRepository.GetExcelFilesAZ(page, pageSize, false, searchTerm);
             }
         }
+
+        public async Task<ResponseExcelDownload> DownloadExcel(int id)
+        {
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            var file = await _excelRepository.GetExcelFile(id);
+            var excelPackage = new ExcelPackage();
+            var worksheet = excelPackage.Workbook.Worksheets.Add("Sheet1");
+
+            var headers = file.Structure.Headers;
+            for (int i = 0; i < headers.Count; i++)
+            {
+                worksheet.Cells[1, i + 1].Value = headers[i];
+            }
+
+            var objects = file.excelObjects;
+            for (int i = 0; i < objects.Count; i++)
+            {
+                var properties = objects[i].ExcelProperties;
+                for (int j = 0; j < properties.Count; j++)
+                {
+                    worksheet.Cells[i + 2, j + 1].Value = properties[j].Value;
+                }
+            }
+
+            var stream = new MemoryStream();
+            excelPackage.SaveAs(stream);
+            stream.Position = 0;
+            return new ResponseExcelDownload { Stream = stream, FileName = file.Name, type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" };
+            
+        }   
     }
 }
