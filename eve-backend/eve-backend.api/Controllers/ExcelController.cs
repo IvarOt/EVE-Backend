@@ -49,5 +49,15 @@ namespace eve_backend.api.Controllers
             await _excelService.UpdateExcel(id, fileName);
             return Ok();
         }
+
+        [HttpGet("{id}/download")]
+        [Produces("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")]
+        public async Task<IActionResult> Download([FromRoute] int id)
+        {
+            var response = await _excelService.DownloadExcel(id);
+            var file = File(response.Stream, response.type, response.FileName);
+            return file;
+        }
+
     }
 }
