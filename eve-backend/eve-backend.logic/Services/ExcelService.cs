@@ -125,5 +125,11 @@ namespace eve_backend.logic.Services
                 : await _excelRepository.GetExcelFilesAZ(page, pageSize, false, searchTerm);
             }
         }
+
+        public async Task<int> GetCount()
+        {
+            var result = await _excelRepository.GetCount();
+            return result;
+        }
     }
 }
