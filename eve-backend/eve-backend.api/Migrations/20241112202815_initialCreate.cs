@@ -12,36 +12,18 @@ namespace eve_backend.api.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "ObjectStructure",
+                name: "ExcelFiles",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Headers = table.Column<string>(type: "nvarchar(max)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ObjectStructure", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "ExcelFiles",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    LastUpdated = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    StructureId = table.Column<int>(type: "int", nullable: false)
+                    Headers = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    LastUpdated = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ExcelFiles", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_ExcelFiles_ObjectStructure_Id",
-                        column: x => x.Id,
-                        principalTable: "ObjectStructure",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -107,9 +89,6 @@ namespace eve_backend.api.Migrations
 
             migrationBuilder.DropTable(
                 name: "ExcelFiles");
-
-            migrationBuilder.DropTable(
-                name: "ObjectStructure");
         }
     }
 }

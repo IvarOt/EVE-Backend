@@ -51,9 +51,9 @@ namespace eve_backend.logic.Services
         }
         public async Task CreateObject(int fileId)
         {
-            ObjectStructure structure = await _excelRepository.GetFileObjectStructure(fileId);
+            List<string> headers = await _excelRepository.GetFileObjectStructure(fileId);
             ExcelObject newObject = new ExcelObject();
-            foreach (var item in structure.Headers)
+            foreach (var item in headers)
             {
                 newObject.ExcelProperties.Add(new ExcelProperty { Name = item, Value = "" });
             }

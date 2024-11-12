@@ -1,10 +1,7 @@
 ﻿using eve_backend.logic.Interfaces;
 using OfficeOpenXml;
-using Newtonsoft.Json;
 using Microsoft.AspNetCore.Http;
 using LicenseContext = OfficeOpenXml.LicenseContext;
-using Formatting = Newtonsoft.Json.Formatting;
-using Newtonsoft.Json.Linq;
 using eve_backend.logic.Models;
 using eve_backend.logic.DTO;
 
@@ -18,10 +15,11 @@ namespace eve_backend.logic.Services
             _excelRepository = excelRepository;
         }
 
-        private async Task<string> GetJsonFromExcelBasic(IFormFile file)
+        public async Task UploadExcel(IFormFile file)
         {
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-            var jsonData = string.Empty;
+            ExcelFile excelFile = new ExcelFile();
+
             using (var stream = new MemoryStream())
             {
                 await file.CopyToAsync(stream);
@@ -32,72 +30,29 @@ namespace eve_backend.logic.Services
                     int colCount = worksheet.Dimension.Columns;
 
                     var rows = new List<Dictionary<string, object>>();
-
-                    var headers = new List<string>();
                     for (int col = 1; col <= colCount; col++)
                     {
-                        headers.Add(worksheet.Cells[1, col].Text);
+                        excelFile.Headers.Add(worksheet.Cells[1, col].Text);
                     }
 
-                    if (rowCount == 1)
+                    for (int row = 2; row <= rowCount; row++)
                     {
-                        var rowData = new Dictionary<string, object>();
+                        ExcelObject excelObject = new ExcelObject();
                         for (int col = 1; col <= colCount; col++)
                         {
-                            rowData[headers[col - 1]] = "";
-                            rows.Add(rowData);
+                            ExcelProperty excelProperty = new ExcelProperty();
+                            excelProperty.Name = file.Name;
+                            excelProperty.Value = worksheet.Cells[row, col].Text;
+                            excelObject.ExcelProperties.Add(excelProperty);
                         }
+                        excelObject.LastUpdated = DateTime.Now;
+                        excelFile.excelObjects.Add(excelObject);
                     }
-                    else
-                    {
-                        for (int row = 2; row <= rowCount; row++)
-                        {
-                            var rowData = new Dictionary<string, object>();
-                            for (int col = 1; col <= colCount; col++)
-                            {
-                                rowData[headers[col - 1]] = worksheet.Cells[row, col].Text;
-                            }
-                            rows.Add(rowData);
-                        }
-                    }
-
-                    jsonData = JsonConvert.SerializeObject(rows, Formatting.Indented);
                 }
             }
-
-            return jsonData;
-        }
-
-        public async Task UploadExcel(IFormFile excelFile)
-        {
-            string json = await GetJsonFromExcelBasic(excelFile);
-            var jsonArray = JArray.Parse(json);
-
-            ExcelFile file = new ExcelFile();
-            var jsonItem = jsonArray.FirstOrDefault();
-
-            foreach (var property in jsonItem.Children<JProperty>())
-            {
-                file.Structure.Headers.Add(property.Name);
-            }
-
-            foreach (var item in jsonArray)
-            {
-                ExcelObject excelObject = new ExcelObject();
-
-                foreach (var property in item.Children<JProperty>())
-                {
-                    ExcelProperty excelProperty = new ExcelProperty();
-                    excelProperty.Name = property.Name;
-                    excelProperty.Value = property.Value.ToString();
-                    excelObject.ExcelProperties.Add(excelProperty);
-                    excelObject.LastUpdated = DateTime.Now;
-                }
-                file.excelObjects.Add(excelObject);
-            }
-            file.Name = excelFile.FileName;
-            file.LastUpdated = DateTime.Now;
-            await _excelRepository.SaveExcelFile(file);
+            excelFile.Name = file.FileName;
+            excelFile.LastUpdated = DateTime.Now;
+            await _excelRepository.SaveExcelFile(excelFile);
         }
 
         public async Task DeleteExcel(int id)
@@ -134,7 +89,7 @@ namespace eve_backend.logic.Services
             var excelPackage = new ExcelPackage();
             var worksheet = excelPackage.Workbook.Worksheets.Add("Sheet1");
 
-            var headers = file.Structure.Headers;
+            var headers = file.Headers;
             for (int i = 0; i < headers.Count; i++)
             {
                 worksheet.Cells[1, i + 1].Value = headers[i];
@@ -154,8 +109,8 @@ namespace eve_backend.logic.Services
             excelPackage.SaveAs(stream);
             stream.Position = 0;
             return new ResponseExcelDownload { Stream = stream, FileName = file.Name, type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" };
-            
-        }   
+
+        }
         public async Task<int> GetCount()
         {
             var result = await _excelRepository.GetCount();

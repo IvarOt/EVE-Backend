@@ -11,12 +11,9 @@ namespace eve_backend.logic.Models
     {
         public int Id { get; set; }
         public string Name { get; set; }
+        public List<string> Headers { get; set; } = new List<string>();
         public List<ExcelObject> excelObjects { get; set; } = new List<ExcelObject>();
         public DateTime LastUpdated { get; set; }
-
-        [ForeignKey("ObjectStructure")]
-        public int StructureId { get; set; }
-        public ObjectStructure Structure { get; set; } = new ObjectStructure();
         public ExcelFile() { }
     }
 }
