@@ -44,7 +44,12 @@ namespace eve_backend.logic.Services
                         var rowData = new Dictionary<string, object>();
                         for (int col = 1; col <= colCount; col++)
                         {
-                            rowData[headers[col - 1]] = "";
+                            var cell = worksheet.Cells[1, col];
+                            rowData[headers[col - 1]] = new
+                            {
+                                Value = cell.Text,
+                                Style = cell.StyleName
+                            };
                             rows.Add(rowData);
                         }
                     }
@@ -55,7 +60,12 @@ namespace eve_backend.logic.Services
                             var rowData = new Dictionary<string, object>();
                             for (int col = 1; col <= colCount; col++)
                             {
-                                rowData[headers[col - 1]] = worksheet.Cells[row, col].Text;
+                                var cell = worksheet.Cells[row, col];
+                                rowData[headers[col - 1]] = new
+                                {
+                                    Value = cell.Text,
+                                    Style = cell.StyleName
+                                };
                             }
                             rows.Add(rowData);
                         }
@@ -89,7 +99,8 @@ namespace eve_backend.logic.Services
                 {
                     ExcelProperty excelProperty = new ExcelProperty();
                     excelProperty.Name = property.Name;
-                    excelProperty.Value = property.Value.ToString();
+                    string toSplitString = property.Value.ToString();
+                    excelProperty.Value = toSplitString;
                     excelObject.ExcelProperties.Add(excelProperty);
                     excelObject.LastUpdated = DateTime.Now;
                 }
