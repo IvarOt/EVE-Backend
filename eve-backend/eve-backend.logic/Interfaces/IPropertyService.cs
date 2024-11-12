@@ -11,6 +11,6 @@ namespace eve_backend.logic.Interfaces
     {
         Task<List<ExcelProperty>> GetProperties(int objectId);
 
-        Task UpdateProperty(int objectId, int propertyId, string value);
+        Task UpdateProperty(int objectId, Guid propertyId, string value);
     }
 }

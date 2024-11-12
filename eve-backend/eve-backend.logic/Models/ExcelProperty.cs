@@ -8,7 +8,7 @@ namespace eve_backend.logic.Models
 {
     public class ExcelProperty
     {
-        public int Id { get; set; }
+        public Guid Id { get; set; }
         public string Name { get; set; }
         public string Value { get; set; }
         public int ExcelObjectId { get; set; }

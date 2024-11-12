@@ -21,7 +21,7 @@ namespace eve_backend.api.Controllers
             return Ok(properties);
         }
         [HttpPut]
-        public async Task<IActionResult> Put(int ObjectId, int PropertyId, string Value)
+        public async Task<IActionResult> Put(int ObjectId, Guid PropertyId, string Value)
         {
             await _propertyService.UpdateProperty(ObjectId, PropertyId, Value);
             return Ok();

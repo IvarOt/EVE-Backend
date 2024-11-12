@@ -65,11 +65,9 @@ namespace eve_backend.api.Migrations
 
             modelBuilder.Entity("eve_backend.logic.Models.ExcelProperty", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("ExcelObjectId")
                         .HasColumnType("int");

@@ -30,7 +30,7 @@ namespace eve_backend.data.Repositories
             }
         }
 
-        public async Task UpdateProperty(int propertyId, string value)
+        public async Task UpdateProperty(Guid propertyId, string value)
         {
             var property = await _context.ExcelProperties.FirstOrDefaultAsync(x => x.Id == propertyId);
             if (property == null)

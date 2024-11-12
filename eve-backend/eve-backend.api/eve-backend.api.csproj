@@ -24,4 +24,8 @@
     <ProjectReference Include="..\eve-backend.logic\eve-backend.logic.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Migrations\" />
+  </ItemGroup>
+
 </Project>
