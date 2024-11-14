@@ -12,8 +12,8 @@ using eve_backend.data;
 namespace eve_backend.api.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241112202815_initialCreate")]
-    partial class initialCreate
+    [Migration("20241114080141_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
