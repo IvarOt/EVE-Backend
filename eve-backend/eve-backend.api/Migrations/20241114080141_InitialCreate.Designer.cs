@@ -12,8 +12,8 @@ using eve_backend.data;
 namespace eve_backend.api.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241028091431_initialCreate")]
-    partial class initialCreate
+    [Migration("20241114080141_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -28,7 +28,14 @@ namespace eve_backend.api.Migrations
             modelBuilder.Entity("eve_backend.logic.Models.ExcelFile", b =>
                 {
                     b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Headers")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("LastUpdated")
                         .HasColumnType("datetime2");
@@ -36,9 +43,6 @@ namespace eve_backend.api.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("StructureId")
-                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -90,34 +94,6 @@ namespace eve_backend.api.Migrations
                     b.HasIndex("ExcelObjectId");
 
                     b.ToTable("ExcelProperties");
-                });
-
-            modelBuilder.Entity("eve_backend.logic.Models.ObjectStructure", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Headers")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ObjectStructure");
-                });
-
-            modelBuilder.Entity("eve_backend.logic.Models.ExcelFile", b =>
-                {
-                    b.HasOne("eve_backend.logic.Models.ObjectStructure", "Structure")
-                        .WithOne()
-                        .HasForeignKey("eve_backend.logic.Models.ExcelFile", "Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Structure");
                 });
 
             modelBuilder.Entity("eve_backend.logic.Models.ExcelObject", b =>

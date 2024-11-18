@@ -92,19 +92,19 @@ namespace eve_backend.data.Repositories
             }
         }
 
-        public async Task<ObjectStructure> GetFileObjectStructure(int fileId)
+        public async Task<List<string>> GetFileObjectStructure(int fileId)
         {
-            ObjectStructure structure = await _context.ExcelFiles.Where(x => x.Id == fileId).Select(x => x.Structure).FirstOrDefaultAsync();
-            if (structure == null)
+            var headers = await _context.ExcelFiles.Where(x => x.Id == fileId).Select(x => x.Headers).FirstOrDefaultAsync();
+            if (headers == null)
             {
                 throw new FileNotFoundException();
             }
-            return structure;
+            return headers;
         }
 
         public async Task<ExcelFile> GetExcelFile(int id)
         {
-            var file = await _context.ExcelFiles.Include(x => x.excelObjects).ThenInclude(x => x.ExcelProperties).Include(x => x.Structure).Where(x => x.Id == id).FirstOrDefaultAsync();
+            var file = await _context.ExcelFiles.Include(x => x.excelObjects).ThenInclude(x => x.ExcelProperties).Where(x => x.Id == id).FirstOrDefaultAsync();
             if (file == null)
             {
                 throw new FileNotFoundException();
