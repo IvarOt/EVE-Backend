@@ -11,6 +11,28 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="testExileFolder\basic%28meer tekst dan headers.xlsx" />
+    <None Remove="testExileFolder\basic%28only header%29.xlsx" />
+    <None Remove="testExileFolder\basic.xlsx" />
+    <None Remove="testExileFolder\basic_2.xlsx" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="testExileFolder\basic(meer tekst dan headers.xlsx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="testExileFolder\basic(only header).xlsx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="testExileFolder\basic.xlsx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="testExileFolder\basic_2.xlsx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="coverlet.collector" Version="6.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="9.0.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />

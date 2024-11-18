@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -57,16 +58,87 @@ namespace EVE_Backend.test
             }
         }
         [TestMethod]
-        public async void Test_UploadExcel_HappyFlow()
+        public void Test_UploadExcel_HappyFlow()
         {
             var excelService = _serviceProvider.GetService<IExcelService>();
-            IFormFile file = ConvertExcelToIFormFile("testExileFolder\\basic.xlsx");
+            IFormFile file = ConvertExcelToIFormFile(".\\testExileFolder\\basic.xlsx");
             excelService.UploadExcel(file);
+            List<string> Headers = new List<string>()
+            {
+                "Nome prodotto",
+                "Brand",
+                "EAN13",
+                "Minsan",
+                "Descrizione",
+                "Keyword (x, y, z, …)"
+            };
+            List<string> Values = new List<string>()
+            {
+                "gert",
+                "pepsi",
+                "12345",
+                "hello",
+                "dit is mooi",
+                "pepsi"
+
+            };
+
             using (var context = new ApplicationDbContext(_dbContextOptions))
             {
-                ExcelFile excelFile = await context.ExcelFiles.Include(x => x.excelObjects).ThenInclude(x => x.ExcelProperties).FirstOrDefaultAsync();
-                Assert.AreEqual("Nome prodotto", excelFile.Headers.First());
+                ExcelFile excelFile = context.ExcelFiles.Include(x => x.excelObjects).ThenInclude(x => x.ExcelProperties).FirstOrDefault();
+                for(var i = 0; excelFile.excelObjects[0].ExcelProperties.Count > i; i++)
+                {
+                    Assert.AreEqual(Values[i] ,excelFile.excelObjects[0].ExcelProperties[i].Value);
+                    Assert.AreEqual(Headers[i], excelFile.excelObjects[0].ExcelProperties[i].Name);
+                }
             }
+        }
+        [TestMethod]
+        public void Test_UploadExcel_OnlyHeaders()
+        {
+            var excelService = _serviceProvider.GetService<IExcelService>();
+            IFormFile file = ConvertExcelToIFormFile(".\\testExileFolder\\basic(only header).xlsx");
+            excelService.UploadExcel(file);
+            List<string> Headers = new List<string>()
+            {
+                "Nome prodotto",
+                "Brand",
+                "EAN13",
+                "Minsan",
+                "Descrizione",
+                "Keyword (x, y, z, …)"
+            };
+            using (var context = new ApplicationDbContext(_dbContextOptions))
+            {
+                ExcelFile excelFile = context.ExcelFiles.FirstOrDefault();
+                CollectionAssert.AreEqual(Headers, excelFile.Headers);
+            }
+        }
+        [TestMethod]
+        public void Test_UploadExcel_Empty()
+        {
+            var excelService = _serviceProvider.GetService<IExcelService>();
+            IFormFile file = ConvertExcelToIFormFile(".\\testExileFolder\\basic(meer tekst dan headers.xlsx");
+            excelService.UploadExcel(file);
+            List<string> Headers = new List<string>()
+            {
+                "Nome",
+                "",
+                "",
+                "Minsan",
+                "Descrizione",
+                "Keyword (x, y, z, …)"
+            };
+            List<string> Values = new List<string>()
+            {
+                "gert",
+                "pepsi",
+                "12345",
+                "hello",
+                "dit is mooi",
+                "pepsi"
+
+            };
         }
     }
 }
