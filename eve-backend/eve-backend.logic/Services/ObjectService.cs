@@ -36,7 +36,6 @@ namespace eve_backend.logic.Services
         public async Task<int> GetCount(int excelId)
         {
             var result = await _objectRepository.GetCount(excelId);
-            result = result - 1;
             return result;
         }
 
