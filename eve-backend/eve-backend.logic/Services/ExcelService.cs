@@ -42,9 +42,14 @@ namespace eve_backend.logic.Services
                             ExcelObject excelObject = new ExcelObject();
                             for (int col = 1; col <= colCount; col++)
                             {
+                                
                                 ExcelProperty excelProperty = new ExcelProperty();
                                 excelProperty.Name = worksheet.Cells[1, col].Text;
                                 excelProperty.Value = worksheet.Cells[row, col].Text;
+                                if (excelProperty.Name == "" && excelProperty.Value != "")
+                                {
+                                    throw new ApplicationException("File has values without headers");
+                                }
                                 excelObject.ExcelProperties.Add(excelProperty);
                             }
                             excelObject.LastUpdated = DateTime.Now;
@@ -71,6 +76,15 @@ namespace eve_backend.logic.Services
 
         public async Task<List<ExcelFile>> GetExcelFiles(int page, int pageSize, bool sortByDate, bool isDescending, string searchTerm)
         {
+            if( pageSize <= 0)
+            {
+                throw new  Exception("pagesize must be bigger then 0");
+            }
+            if ( page < 0 ) 
+            {
+                throw new Exception("page must be bigger then -1");
+            }
+                
             if (sortByDate)
             {
                 return isDescending

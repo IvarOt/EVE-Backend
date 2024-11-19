@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -58,11 +59,11 @@ namespace EVE_Backend.test
             }
         }
         [TestMethod]
-        public void Test_UploadExcel_HappyFlow()
+        public async Task Test_UploadExcel_HappyFlow()
         {
             var excelService = _serviceProvider.GetService<IExcelService>();
             IFormFile file = ConvertExcelToIFormFile(".\\testExileFolder\\basic.xlsx");
-            excelService.UploadExcel(file);
+            await excelService.UploadExcel(file);
             List<string> Headers = new List<string>()
             {
                 "Nome prodotto",
@@ -94,11 +95,11 @@ namespace EVE_Backend.test
             }
         }
         [TestMethod]
-        public void Test_UploadExcel_OnlyHeaders()
+        public async Task Test_UploadExcel_OnlyHeaders()
         {
             var excelService = _serviceProvider.GetService<IExcelService>();
             IFormFile file = ConvertExcelToIFormFile(".\\testExileFolder\\basic(only header).xlsx");
-            excelService.UploadExcel(file);
+            await excelService.UploadExcel(file);
             List<string> Headers = new List<string>()
             {
                 "Nome prodotto",
@@ -115,30 +116,18 @@ namespace EVE_Backend.test
             }
         }
         [TestMethod]
-        public void Test_UploadExcel_Empty()
+        public async Task Test_UploadExcel_MoreInputThenHeaders()
         {
             var excelService = _serviceProvider.GetService<IExcelService>();
-            IFormFile file = ConvertExcelToIFormFile(".\\testExileFolder\\basic(meer tekst dan headers.xlsx");
-            excelService.UploadExcel(file);
-            List<string> Headers = new List<string>()
-            {
-                "Nome",
-                "",
-                "",
-                "Minsan",
-                "Descrizione",
-                "Keyword (x, y, z, …)"
-            };
-            List<string> Values = new List<string>()
-            {
-                "gert",
-                "pepsi",
-                "12345",
-                "hello",
-                "dit is mooi",
-                "pepsi"
-
-            };
+            IFormFile file = ConvertExcelToIFormFile(".\\testExileFolder\\basic(meer tekst dan headers).xlsx");
+            await Assert.ThrowsExceptionAsync<ApplicationException>( () =>  excelService.UploadExcel(file));
+        }
+        [TestMethod]
+        public async Task Test_UploadExcel_Intermediate()
+        {
+            var excelService = _serviceProvider.GetService<IExcelService>();
+            IFormFile file = ConvertExcelToIFormFile(".\\testExileFolder\\intermediate.xlsx");
+            await Assert.ThrowsExceptionAsync<ApplicationException>(() => excelService.UploadExcel(file));
         }
     }
 }
