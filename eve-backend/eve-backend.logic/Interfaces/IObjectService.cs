@@ -9,7 +9,9 @@ namespace eve_backend.logic.Interfaces
 {
     public interface IObjectService
     {
-        Task<List<ExcelObject>> GetObjects(int id);
+        Task<List<ExcelObject>> GetObjects(int page, int pagesize, bool isDescending, int excelId);
+        Task<ExcelObject> GetObject(int page, int excelId);
+        Task<int> GetCount(int excelId);
         Task CreateObject(int fileId);
         Task DeleteObject(int objectId);
         Task UpdateObject(int objectId);

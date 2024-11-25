@@ -17,10 +17,36 @@ namespace eve_backend.data.Repositories
         {
             _context = context;
         }
-        public async Task<List<ExcelObject>> GetObjects(int excelId)
+        public async Task<List<ExcelObject>> GetObjects(int page, int pagesize, bool isDescending, int excelId)
         {
-            var objects = await _context.ExcelObjects.Include(x => x.ExcelProperties).Where(x => x.ExcelFileId == excelId).ToListAsync();
-            return objects;
+            page = pagesize * page;
+            var result =  isDescending
+                ? await _context.ExcelObjects.Where(x => x.ExcelFileId == excelId).OrderByDescending(x => x.LastUpdated).Skip(page).Take(pagesize).ToListAsync()
+                : await _context.ExcelObjects.Where(x => x.ExcelFileId == excelId).OrderBy(x => x.LastUpdated).Skip(page).Take(pagesize).ToListAsync();
+
+
+            if (result == null)
+            {
+                throw new FileNotFoundException();
+            }
+            return result;
+
+        }
+
+        public async Task<ExcelObject> GetObject(int page, int excelId)
+        {
+            page = page--;
+            var result = await _context.ExcelObjects.Where(x => x.ExcelFileId == excelId).Skip(page).Take(1).FirstOrDefaultAsync();
+            if (result == null)
+            {
+                throw new FileNotFoundException();
+            }
+            return result;
+        }
+        public async Task<int> GetCount(int excelId)
+        {
+            var result = await _context.ExcelObjects.Where(x => x.ExcelFileId == excelId).CountAsync();
+            return result;
         }
 
         public async Task UpdateObject(int objectId, DateTime dateTime)

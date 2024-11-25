@@ -17,9 +17,15 @@ namespace eve_backend.api.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Get()
+        public async Task<IActionResult> Get(int page, int pagesize, bool sortByDate, bool isDescending, string? searchTerm)
         {
-            var files = await _excelService.GetExcelFiles();
+            var files = await _excelService.GetExcelFiles(page, pagesize, sortByDate, isDescending, searchTerm);
+            return Ok(files);
+        }
+        [HttpGet("Count")]
+        public async Task <IActionResult> Get()
+        {
+            var files = await _excelService.GetCount();
             return Ok(files);
         }
 
@@ -43,5 +49,15 @@ namespace eve_backend.api.Controllers
             await _excelService.UpdateExcel(id, fileName);
             return Ok();
         }
+
+        [HttpGet("{id}/download")]
+        [Produces("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")]
+        public async Task<IActionResult> Download([FromRoute] int id)
+        {
+            var response = await _excelService.DownloadExcel(id);
+            var file = File(response.Stream, response.type, response.FileName);
+            return file;
+        }
+
     }
 }

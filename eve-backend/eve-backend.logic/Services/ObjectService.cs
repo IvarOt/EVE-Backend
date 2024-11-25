@@ -10,18 +10,33 @@ namespace eve_backend.logic.Services
 {
     public class ObjectService : IObjectService
     {
+        private readonly IPropertyRepository _propertyRepository;
         private readonly IObjectRepository _objectRepository;
         private readonly IExcelRepository _excelRepository;
-        public ObjectService(IObjectRepository objectRepository, IExcelRepository excelRepository)
+        public ObjectService(IObjectRepository objectRepository, IExcelRepository excelRepository, IPropertyRepository propertyRepository)
         {
             _objectRepository = objectRepository;
             _excelRepository = excelRepository;
+            _propertyRepository = propertyRepository;
         }
 
-        public async Task<List<ExcelObject>> GetObjects(int excelId)
+        public async Task<List<ExcelObject>> GetObjects(int page, int pagesize, bool isDescending, int excelId)
         {
-            var objects = await _objectRepository.GetObjects(excelId);
+            var objects = await _objectRepository.GetObjects(page, pagesize, isDescending, excelId);
             return objects;
+        }
+
+        public async Task<ExcelObject> GetObject(int page, int excelId)
+        {
+            var result = await _objectRepository.GetObject(page, excelId);
+            result.ExcelProperties = await _propertyRepository.GetProperties(result.Id);
+            return result;
+        }
+
+        public async Task<int> GetCount(int excelId)
+        {
+            var result = await _objectRepository.GetCount(excelId);
+            return result;
         }
 
         public async Task UpdateObject(int objectId)
@@ -35,9 +50,9 @@ namespace eve_backend.logic.Services
         }
         public async Task CreateObject(int fileId)
         {
-            ObjectStructure structure = await _excelRepository.GetFileObjectStructure(fileId);
+            List<string> headers = await _excelRepository.GetFileObjectStructure(fileId);
             ExcelObject newObject = new ExcelObject();
-            foreach (var item in structure.Headers)
+            foreach (var item in headers)
             {
                 newObject.ExcelProperties.Add(new ExcelProperty { Name = item, Value = "" });
             }
