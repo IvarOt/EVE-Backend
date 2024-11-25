@@ -35,18 +35,26 @@ namespace eve_backend.logic.Services
                         excelFile.Headers.Add(worksheet.Cells[1, col].Text);
                     }
 
-                    for (int row = 2; row <= rowCount; row++)
+                    if (rowCount > 1)
                     {
-                        ExcelObject excelObject = new ExcelObject();
-                        for (int col = 1; col <= colCount; col++)
+                        for (int row = 2; row <= rowCount; row++)
                         {
-                            ExcelProperty excelProperty = new ExcelProperty();
-                            excelProperty.Name = file.Name;
-                            excelProperty.Value = worksheet.Cells[row, col].Text;
-                            excelObject.ExcelProperties.Add(excelProperty);
+                            ExcelObject excelObject = new ExcelObject();
+                            for (int col = 1; col <= colCount; col++)
+                            {
+                                
+                                ExcelProperty excelProperty = new ExcelProperty();
+                                excelProperty.Name = worksheet.Cells[1, col].Text;
+                                excelProperty.Value = worksheet.Cells[row, col].Text;
+                                if (excelProperty.Name == "" && excelProperty.Value != "")
+                                {
+                                    throw new ApplicationException("File has values without headers");
+                                }
+                                excelObject.ExcelProperties.Add(excelProperty);
+                            }
+                            excelObject.LastUpdated = DateTime.Now;
+                            excelFile.excelObjects.Add(excelObject);
                         }
-                        excelObject.LastUpdated = DateTime.Now;
-                        excelFile.excelObjects.Add(excelObject);
                     }
                 }
             }
@@ -68,6 +76,15 @@ namespace eve_backend.logic.Services
 
         public async Task<List<ExcelFile>> GetExcelFiles(int page, int pageSize, bool sortByDate, bool isDescending, string searchTerm)
         {
+            if( pageSize <= 0)
+            {
+                throw new  Exception("pagesize must be bigger then 0");
+            }
+            if ( page < 0 ) 
+            {
+                throw new Exception("page must be bigger then -1");
+            }
+                
             if (sortByDate)
             {
                 return isDescending
