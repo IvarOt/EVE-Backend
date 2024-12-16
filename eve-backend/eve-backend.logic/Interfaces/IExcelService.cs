@@ -18,5 +18,6 @@ namespace eve_backend.logic.Interfaces
         Task<List<ExcelFile>> GetExcelFiles(int page, int pageSize, bool sortByDate, bool isDescending, string searchTerm);
         Task<ResponseExcelDownload> DownloadExcel(int id);
         Task<int> GetCount();
+        Task UpdateObjectIdentifier(int id, string objectIdentifier);
     }
 }

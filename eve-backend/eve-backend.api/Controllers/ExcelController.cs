@@ -59,5 +59,11 @@ namespace eve_backend.api.Controllers
             return file;
         }
 
+        [HttpPut("ChangeIdentifier")]
+        public async Task<IActionResult> ChangeObjectIdentifier(int id, string objectIdentifier)
+        {
+            await _excelService.UpdateObjectIdentifier(id, objectIdentifier);
+            return Ok();
+        }
     }
 }

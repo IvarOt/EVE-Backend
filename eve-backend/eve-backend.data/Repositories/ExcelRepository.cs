@@ -111,5 +111,19 @@ namespace eve_backend.data.Repositories
             }
             return file;
         }
+
+        public async Task UpdateObjectIdentifier(int id, string objectIdentifier)
+        {
+            var file = await _context.ExcelFiles.Where(x => x.Id == id).FirstOrDefaultAsync();
+            if (file == null)
+            {
+                throw new FileNotFoundException();
+            }
+            else
+            {
+                file.ObjectIdentifier = objectIdentifier;
+                await _context.SaveChangesAsync();
+            }
+        }
     }
 }

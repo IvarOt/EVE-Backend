@@ -19,6 +19,6 @@ namespace eve_backend.logic.Interfaces
         Task<List<string>> GetFileObjectStructure(int fileId);
         Task<ExcelFile> GetExcelFile(int id);
         Task<int> GetCount();
-
+        Task UpdateObjectIdentifier(int id, string objectIdentifier);
     }
 }

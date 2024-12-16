@@ -15,6 +15,12 @@ namespace eve_backend.logic.Services
             _excelRepository = excelRepository;
         }
 
+        public async Task UpdateObjectIdentifier(int id, string objectIdentifier)
+        {
+            await _excelRepository.UpdateObjectIdentifier(id, objectIdentifier);
+        }
+
+
         public async Task UploadExcel(IFormFile file)
         {
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
@@ -59,6 +65,7 @@ namespace eve_backend.logic.Services
                 }
             }
             excelFile.Name = file.FileName;
+            excelFile.ObjectIdentifier = excelFile.Headers.FirstOrDefault().ToString();
             excelFile.LastUpdated = DateTime.Now;
             await _excelRepository.SaveExcelFile(excelFile);
         }

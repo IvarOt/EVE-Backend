@@ -12,7 +12,7 @@ using eve_backend.data;
 namespace eve_backend.api.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241114080141_InitialCreate")]
+    [Migration("20241216084400_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -41,6 +41,10 @@ namespace eve_backend.api.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ObjectIdentifier")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
