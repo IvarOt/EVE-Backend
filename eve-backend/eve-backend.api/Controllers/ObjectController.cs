@@ -1,4 +1,5 @@
-﻿using eve_backend.logic.Interfaces;
+﻿using eve_backend.logic.DTO;
+using eve_backend.logic.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,7 +17,7 @@ namespace eve_backend.api.Controllers
         [HttpGet("{ExcelId}")]
         public async Task<IActionResult> GetAllObjects(int page, int pagesize, bool isDescending, int ExcelId)
         {
-            var objects = await _objectService.GetObjects(page, pagesize, isDescending, ExcelId);
+            ResponseGetAllObjects objects = await _objectService.GetObjects(page, pagesize, isDescending, ExcelId);
             return Ok(objects);
         }
 
