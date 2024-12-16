@@ -40,6 +40,7 @@ namespace eve_backend.logic.Services
                     {
                         excelFile.Headers.Add(worksheet.Cells[1, col].Text);
                     }
+                    excelFile.ObjectIdentifier = excelFile.Headers.FirstOrDefault().ToString();
 
                     if (rowCount > 1)
                     {
@@ -58,6 +59,7 @@ namespace eve_backend.logic.Services
                                 }
                                 excelObject.ExcelProperties.Add(excelProperty);
                             }
+                            excelObject.Identifier = excelObject.ExcelProperties.Where(x => x.Name == excelFile.ObjectIdentifier).FirstOrDefault().Value.ToString();
                             excelObject.LastUpdated = DateTime.Now;
                             excelFile.excelObjects.Add(excelObject);
                         }
@@ -65,7 +67,6 @@ namespace eve_backend.logic.Services
                 }
             }
             excelFile.Name = file.FileName;
-            excelFile.ObjectIdentifier = excelFile.Headers.FirstOrDefault().ToString();
             excelFile.LastUpdated = DateTime.Now;
             await _excelRepository.SaveExcelFile(excelFile);
         }

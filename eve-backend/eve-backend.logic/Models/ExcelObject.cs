@@ -10,6 +10,7 @@ namespace eve_backend.logic.Models
     public class ExcelObject
     {
         public int Id { get; set; }
+        public string Identifier { get; set; }
         public List<ExcelProperty> ExcelProperties { get; set; } = new List<ExcelProperty>();
         public DateTime LastUpdated { get; set; }
         public int ExcelFileId { get; set; }

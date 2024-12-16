@@ -19,6 +19,7 @@ namespace eve_backend.data.Repositories
         }
         public async Task<List<ExcelObject>> GetObjects(int page, int pagesize, bool isDescending, int excelId)
         {
+            var file = await _context.ExcelFiles.Where(x => x.Id == excelId).FirstOrDefaultAsync();
             page = pagesize * page;
             var result =  isDescending
                 ? await _context.ExcelObjects.Where(x => x.ExcelFileId == excelId).OrderByDescending(x => x.LastUpdated).Skip(page).Take(pagesize).ToListAsync()

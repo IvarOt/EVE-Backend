@@ -114,7 +114,7 @@ namespace eve_backend.data.Repositories
 
         public async Task UpdateObjectIdentifier(int id, string objectIdentifier)
         {
-            var file = await _context.ExcelFiles.Where(x => x.Id == id).FirstOrDefaultAsync();
+            var file = await _context.ExcelFiles.Where(x => x.Id == id).Include(x => x.excelObjects).ThenInclude(x => x.ExcelProperties).FirstOrDefaultAsync();
             if (file == null)
             {
                 throw new FileNotFoundException();
@@ -122,6 +122,14 @@ namespace eve_backend.data.Repositories
             else
             {
                 file.ObjectIdentifier = objectIdentifier;
+                foreach (var obj in file.excelObjects)
+                {
+                    var prop = obj.ExcelProperties.Where(x => x.Name == objectIdentifier).FirstOrDefault();
+                    if (prop != null)
+                    {
+                        obj.Identifier = prop.Value;
+                    }
+                }
                 await _context.SaveChangesAsync();
             }
         }
