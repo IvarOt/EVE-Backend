@@ -28,6 +28,7 @@ namespace eve_backend.logic.Services
             ResponseGetAllObjects response = new ResponseGetAllObjects();
             response.objects = objects;
             response.ObjectIdentifier = excelfile.ObjectIdentifier;
+
             return response;
         }
 
