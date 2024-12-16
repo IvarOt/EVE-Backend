@@ -1,4 +1,5 @@
-﻿using eve_backend.logic.Interfaces;
+﻿using eve_backend.logic.DTO;
+using eve_backend.logic.Interfaces;
 using eve_backend.logic.Models;
 using System;
 using System.Collections.Generic;
@@ -20,10 +21,14 @@ namespace eve_backend.logic.Services
             _propertyRepository = propertyRepository;
         }
 
-        public async Task<List<ExcelObject>> GetObjects(int page, int pagesize, bool isDescending, int excelId)
+        public async Task<ResponseGetAllObjects> GetObjects(int page, int pagesize, bool isDescending, int excelId)
         {
             var objects = await _objectRepository.GetObjects(page, pagesize, isDescending, excelId);
-            return objects;
+            ExcelFile excelfile = await _excelRepository.GetExcelFile(excelId);
+            ResponseGetAllObjects response = new ResponseGetAllObjects();
+            response.objects = objects;
+            response.ObjectIdentifier = excelfile.ObjectIdentifier;
+            return response;
         }
 
         public async Task<ExcelObject> GetObject(int page, int excelId)
