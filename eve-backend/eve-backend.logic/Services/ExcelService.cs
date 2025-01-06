@@ -72,6 +72,7 @@ namespace eve_backend.logic.Services
 
                     var HeaderStyle = Header.Style;
                     var AttributeStyle = Attribute.Style;
+
                 }
             }
             excelFile.Name = file.FileName;
