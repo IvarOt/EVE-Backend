@@ -32,7 +32,7 @@ namespace eve_backend.api.Controllers
         [HttpPost]
         public async Task<IActionResult> Post(IFormFile file)
         {
-            await _excelService.UploadExcel(file);
+            await _excelService.UploadBasicExcel(file);
             return Ok();
         }
 

@@ -63,7 +63,7 @@ namespace EVE_Backend.test
         {
             var excelService = _serviceProvider.GetService<IExcelService>();
             IFormFile file = ConvertExcelToIFormFile(".\\testExileFolder\\basic.xlsx");
-            await excelService.UploadExcel(file);
+            await excelService.UploadBasicExcel(file);
             List<string> Headers = new List<string>()
             {
                 "Nome prodotto",
@@ -99,7 +99,7 @@ namespace EVE_Backend.test
         {
             var excelService = _serviceProvider.GetService<IExcelService>();
             IFormFile file = ConvertExcelToIFormFile(".\\testExileFolder\\basic(only header).xlsx");
-            await excelService.UploadExcel(file);
+            await excelService.UploadBasicExcel(file);
             List<string> Headers = new List<string>()
             {
                 "Nome prodotto",
@@ -120,14 +120,14 @@ namespace EVE_Backend.test
         {
             var excelService = _serviceProvider.GetService<IExcelService>();
             IFormFile file = ConvertExcelToIFormFile(".\\testExileFolder\\basic(meer tekst dan headers).xlsx");
-            await Assert.ThrowsExceptionAsync<ApplicationException>( () =>  excelService.UploadExcel(file));
+            await Assert.ThrowsExceptionAsync<ApplicationException>( () =>  excelService.UploadBasicExcel(file));
         }
         [TestMethod]
         public async Task Test_UploadExcel_Intermediate()
         {
             var excelService = _serviceProvider.GetService<IExcelService>();
             IFormFile file = ConvertExcelToIFormFile(".\\testExileFolder\\intermediate.xlsx");
-            await Assert.ThrowsExceptionAsync<ApplicationException>(() => excelService.UploadExcel(file));
+            await Assert.ThrowsExceptionAsync<ApplicationException>(() => excelService.UploadBasicExcel(file));
         }
     }
 }

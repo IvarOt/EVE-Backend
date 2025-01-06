@@ -20,12 +20,70 @@ namespace eve_backend.logic.Services
             await _excelRepository.UpdateObjectIdentifier(id, objectIdentifier);
         }
 
+        public async Task HandleUploadExcel(IFormFile file)
+        {
+           if (await CheckForConfig(file))
+            {
+               await UploadIntermediateExcel(file);
+           }
+           else
+            {
+               await UploadBasicExcel(file);
+           }
+        }
 
-        public async Task UploadExcel(IFormFile file)
+        public async Task<bool> CheckForConfig(IFormFile file)
+        {
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            ExcelFile excelFile = new ExcelFile();
+            using (var stream = new MemoryStream())
+            {
+                await file.CopyToAsync(stream);
+                using (var package = new ExcelPackage(stream))
+                {
+                    foreach (var worksheet in package.Workbook.Worksheets)
+                    {
+                        if (worksheet.Name == "Config")
+                        {
+                            return true;
+                        } 
+                    }
+                    return false;
+                }
+            }
+        }
+
+        public async Task UploadIntermediateExcel(IFormFile file)
         {
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
             ExcelFile excelFile = new ExcelFile();
 
+            using (var stream = new MemoryStream())
+            {
+                await file.CopyToAsync(stream);
+                using (var package = new ExcelPackage(stream))
+                {
+                    var ConfigSheet = package.Workbook.Worksheets.Where(x => x.Name == "Config").FirstOrDefault();
+                    int rowCount = ConfigSheet.Dimension.Rows;
+                    int colCount = ConfigSheet.Dimension.Columns;
+
+                    var Header = ConfigSheet.Cells.Where(x => x.Value.ToString() == "Header").FirstOrDefault();
+                    var Attribute = ConfigSheet.Cells.Where(x => x.Value.ToString() == "Attribute").FirstOrDefault();
+
+                    var HeaderStyle = Header.Style;
+                    var AttributeStyle = Attribute.Style;
+                }
+            }
+            excelFile.Name = file.FileName;
+            excelFile.LastUpdated = DateTime.Now;
+            await _excelRepository.SaveExcelFile(excelFile);
+        }
+
+        public async Task UploadBasicExcel(IFormFile file)
+        {
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            ExcelFile excelFile = new ExcelFile();
+            
             using (var stream = new MemoryStream())
             {
                 await file.CopyToAsync(stream);
