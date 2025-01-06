@@ -33,7 +33,7 @@ namespace EVE_Backend.test
             _serviceProvider = serviceCollection.BuildServiceProvider();
             var excelService = _serviceProvider.GetService<IExcelService>();
             IFormFile file = ConvertExcelToIFormFile(".\\testExileFolder\\basic.xlsx");
-            await excelService.UploadBasicExcel(file);
+            await excelService.UploadExcel(file);
 
         }
         public IFormFile ConvertExcelToIFormFile(string filePath)

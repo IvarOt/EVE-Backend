@@ -35,8 +35,8 @@ namespace EVE_Backend.test
             var excelService = _serviceProvider.GetService<IExcelService>();
             IFormFile file = ConvertExcelToIFormFile(".\\testExileFolder\\zzzz.xlsx");
             IFormFile file2 = ConvertExcelToIFormFile(".\\testExileFolder\\aaaa.xlsx");
-            await excelService.UploadBasicExcel(file);
-            await excelService.UploadBasicExcel(file2);
+            await excelService.UploadExcel(file);
+            await excelService.UploadExcel(file2);
 
         }
         public IFormFile ConvertExcelToIFormFile(string filePath)
