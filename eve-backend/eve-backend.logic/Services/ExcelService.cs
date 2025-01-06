@@ -44,7 +44,7 @@ namespace eve_backend.logic.Services
                 {
                     foreach (var worksheet in package.Workbook.Worksheets)
                     {
-                        if (worksheet.Name == "Config")
+                        if (worksheet.Name.ToLower() == "config") 
                         {
                             return true;
                         } 
@@ -64,12 +64,12 @@ namespace eve_backend.logic.Services
                 await file.CopyToAsync(stream);
                 using (var package = new ExcelPackage(stream))
                 {
-                    var ConfigSheet = package.Workbook.Worksheets.Where(x => x.Name == "Config").FirstOrDefault();
+                    var ConfigSheet = package.Workbook.Worksheets.Where(x => x.Name.ToLower() == "config").FirstOrDefault();
                     int rowCount = package.Workbook.Worksheets[0].Dimension.Rows;
                     int colCount = package.Workbook.Worksheets[0].Dimension.Columns;
 
-                    var Header = ConfigSheet.Cells.Where(x => x.Value.ToString() == "Header").FirstOrDefault();
-                    var Attribute = ConfigSheet.Cells.Where(x => x.Value.ToString() == "Attribute").FirstOrDefault();
+                    var Header = ConfigSheet.Cells.Where(x => x.Value.ToString().ToLower() == "header").FirstOrDefault();
+                    var Attribute = ConfigSheet.Cells.Where(x => x.Value.ToString().ToLower() == "attribute").FirstOrDefault();
 
                     var HeaderStyle = Header.Style;
                     var AttributeStyle = Attribute.Style;
@@ -85,6 +85,7 @@ namespace eve_backend.logic.Services
                                 && HeaderStyle.Font.Bold == cell.Font.Bold 
                                 && !string.IsNullOrEmpty(cellValue) 
                                 && HeaderStyle.Font.Color.Indexed == cell.Font.Color.Indexed
+                                && HeaderStyle.Fill.BackgroundColor.Rgb == cell.Fill.BackgroundColor.Rgb
                                 )
                             {
                                 excelFile.Headers.Add(cellValue);

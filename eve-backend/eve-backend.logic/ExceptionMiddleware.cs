@@ -25,6 +25,7 @@ namespace eve_backend.logic
             }
             catch (Exception ex)
             {
+                throw;
                 await HandleException(context, ex);
             }
         }
