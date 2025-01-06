@@ -63,6 +63,7 @@ namespace eve_backend.logic.Services
                 newObject.ExcelProperties.Add(new ExcelProperty { Name = item, Value = "" });
             }
             newObject.LastUpdated = DateTime.Now;
+            newObject.Identifier = "";
             newObject.ExcelFileId = fileId;
             await _objectRepository.CreateObject(newObject);
         }
