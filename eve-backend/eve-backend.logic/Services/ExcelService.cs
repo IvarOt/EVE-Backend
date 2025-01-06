@@ -5,6 +5,9 @@ using LicenseContext = OfficeOpenXml.LicenseContext;
 using eve_backend.logic.Models;
 using eve_backend.logic.DTO;
 using System.Text.Json;
+using System.Data.Common;
+using OfficeOpenXml.Style;
+using OfficeOpenXml.DataValidation;
 
 namespace eve_backend.logic.Services
 {
@@ -23,14 +26,14 @@ namespace eve_backend.logic.Services
 
         public async Task HandleUploadExcel(IFormFile file)
         {
-           if (await CheckForConfig(file))
+            if (await CheckForConfig(file))
             {
-               await UploadIntermediateExcel(file);
-           }
-           else
+                await UploadIntermediateExcel(file);
+            }
+            else
             {
-               await UploadBasicExcel(file);
-           }
+                await UploadBasicExcel(file);
+            }
         }
 
         public async Task<bool> CheckForConfig(IFormFile file)
@@ -44,10 +47,10 @@ namespace eve_backend.logic.Services
                 {
                     foreach (var worksheet in package.Workbook.Worksheets)
                     {
-                        if (worksheet.Name.ToLower() == "config") 
+                        if (worksheet.Name.ToLower() == "config")
                         {
                             return true;
-                        } 
+                        }
                     }
                     return false;
                 }
@@ -64,32 +67,34 @@ namespace eve_backend.logic.Services
                 await file.CopyToAsync(stream);
                 using (var package = new ExcelPackage(stream))
                 {
+                    var sheets = package.Workbook.Worksheets.Where(x => x.Name.ToLower() != "config").ToList();
                     var ConfigSheet = package.Workbook.Worksheets.Where(x => x.Name.ToLower() == "config").FirstOrDefault();
-                    int rowCount = package.Workbook.Worksheets[0].Dimension.Rows;
-                    int colCount = package.Workbook.Worksheets[0].Dimension.Columns;
 
-                    var Header = ConfigSheet.Cells.Where(x => x.Value.ToString().ToLower() == "header").FirstOrDefault();
-                    var Attribute = ConfigSheet.Cells.Where(x => x.Value.ToString().ToLower() == "attribute").FirstOrDefault();
+                    if (ConfigSheet == null)
+                    {
+                        throw new Exception("Config sheet not found.");
+                    }
+
+                    var Header = ConfigSheet.Cells.FirstOrDefault(x => x.Value != null && x.Value.ToString().ToLower() == "header");
+                    var Attribute = ConfigSheet.Cells.FirstOrDefault(x => x.Value != null && x.Value.ToString().ToLower() == "attribute");
 
                     var HeaderStyle = Header.Style;
                     var AttributeStyle = Attribute.Style;
 
-                    for (int rowIndex = 0; rowIndex <= rowCount; rowIndex++)
+                    var headerLocation = new { Row = Header.Start.Row, Column = Header.Start.Column };
+                    var attributeLocation = new { Row = Attribute.Start.Row, Column = Attribute.Start.Column };
+                    foreach (var sheet in sheets)
                     {
-                        for (int colIndex = 0; colIndex <= colCount; colIndex++)
-                        {
-                            var cell = package.Workbook.Worksheets[0].Cells[rowIndex + 1, colIndex + 1].Style;
-                            var cellValue = package.Workbook.Worksheets[0].Cells[rowIndex + 1, colIndex + 1].Text;
+                        int rowCount = sheet.Dimension.Rows;
+                        int colCount = sheet.Dimension.Columns;
 
-                            if (HeaderStyle.Font.Name == cell.Font.Name 
-                                && HeaderStyle.Font.Bold == cell.Font.Bold 
-                                && !string.IsNullOrEmpty(cellValue) 
-                                && HeaderStyle.Font.Color.Indexed == cell.Font.Color.Indexed
-                                && HeaderStyle.Fill.BackgroundColor.Rgb == cell.Fill.BackgroundColor.Rgb
-                                )
-                            {
-                                excelFile.Headers.Add(cellValue);
-                            }
+                        if (headerLocation.Row == attributeLocation.Row)
+                        {
+                            excelFile.Headers = ReadOutColumnHeaders(headerLocation.Column, rowCount, sheet, HeaderStyle);
+                        }
+                        else
+                        {
+                            excelFile.Headers = ReadOutRowHeaders(headerLocation.Row, colCount, sheet, HeaderStyle, headerLocation.Column);
                         }
                     }
                 }
@@ -98,11 +103,56 @@ namespace eve_backend.logic.Services
             excelFile.LastUpdated = DateTime.Now;
         }
 
+        private List<string> ReadOutColumnHeaders(int headerLocationColumn, int rowCount, ExcelWorksheet sheet, ExcelStyle HeaderStyle)
+        {
+            //column headers
+            var headerStart = headerLocationColumn;
+            List<string> headers = new List<string>();
+            for (int i = headerStart; i <= rowCount; i++)
+            {
+                var cell = sheet.Cells[i, headerLocationColumn].Style;
+                var cellValue = sheet.Cells[i, headerLocationColumn].Text;
+
+                if (HeaderStyle.Font.Name == cell.Font.Name
+                                                && HeaderStyle.Font.Bold == cell.Font.Bold
+                                                && !string.IsNullOrEmpty(cellValue)
+                                                && HeaderStyle.Font.Color.Indexed == cell.Font.Color.Indexed
+                                                && HeaderStyle.Fill.BackgroundColor.Rgb == cell.Fill.BackgroundColor.Rgb
+                                                )
+                {
+                    headers.Add(cellValue);
+                }
+            }
+            return headers;
+        }
+
+        private List<string> ReadOutRowHeaders(int headerLocationRow, int rowCount, ExcelWorksheet sheet, ExcelStyle HeaderStyle, int headerLocationColumn)
+        {
+            List<string> headers = new List<string>();
+
+            for (int i = headerLocationColumn; i <= rowCount; i++)
+            {
+                var cell = sheet.Cells[headerLocationRow, i].Style;
+                var cellValue = sheet.Cells[headerLocationRow, i].Text;
+
+                if (HeaderStyle.Font.Name == cell.Font.Name
+                        && HeaderStyle.Font.Bold == cell.Font.Bold
+                        && !string.IsNullOrEmpty(cellValue)
+                        && HeaderStyle.Font.Color.Indexed == cell.Font.Color.Indexed
+                        && HeaderStyle.Fill.BackgroundColor.Rgb == cell.Fill.BackgroundColor.Rgb
+                        )
+                {
+                    headers.Add(cellValue);
+                }
+            }
+            return headers;
+        }
+
         public async Task UploadBasicExcel(IFormFile file)
         {
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
             ExcelFile excelFile = new ExcelFile();
-            
+
             using (var stream = new MemoryStream())
             {
                 await file.CopyToAsync(stream);
@@ -126,7 +176,7 @@ namespace eve_backend.logic.Services
                             ExcelObject excelObject = new ExcelObject();
                             for (int col = 1; col <= colCount; col++)
                             {
-                                
+
                                 ExcelProperty excelProperty = new ExcelProperty();
                                 excelProperty.Name = worksheet.Cells[1, col].Text;
                                 excelProperty.Value = worksheet.Cells[row, col].Text;
@@ -161,15 +211,15 @@ namespace eve_backend.logic.Services
 
         public async Task<List<ExcelFile>> GetExcelFiles(int page, int pageSize, bool sortByDate, bool isDescending, string searchTerm)
         {
-            if( pageSize <= 0)
+            if (pageSize <= 0)
             {
-                throw new  Exception("pagesize must be bigger then 0");
+                throw new Exception("pagesize must be bigger then 0");
             }
-            if ( page < 0 ) 
+            if (page < 0)
             {
                 throw new Exception("page must be bigger then -1");
             }
-                
+
             if (sortByDate)
             {
                 return isDescending
