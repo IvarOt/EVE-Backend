@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using LicenseContext = OfficeOpenXml.LicenseContext;
 using eve_backend.logic.Models;
 using eve_backend.logic.DTO;
+using System.Text.Json;
 
 namespace eve_backend.logic.Services
 {
@@ -64,8 +65,8 @@ namespace eve_backend.logic.Services
                 using (var package = new ExcelPackage(stream))
                 {
                     var ConfigSheet = package.Workbook.Worksheets.Where(x => x.Name == "Config").FirstOrDefault();
-                    int rowCount = ConfigSheet.Dimension.Rows;
-                    int colCount = ConfigSheet.Dimension.Columns;
+                    int rowCount = package.Workbook.Worksheets[0].Dimension.Rows;
+                    int colCount = package.Workbook.Worksheets[0].Dimension.Columns;
 
                     var Header = ConfigSheet.Cells.Where(x => x.Value.ToString() == "Header").FirstOrDefault();
                     var Attribute = ConfigSheet.Cells.Where(x => x.Value.ToString() == "Attribute").FirstOrDefault();
@@ -73,11 +74,27 @@ namespace eve_backend.logic.Services
                     var HeaderStyle = Header.Style;
                     var AttributeStyle = Attribute.Style;
 
+                    for (int rowIndex = 0; rowIndex <= rowCount; rowIndex++)
+                    {
+                        for (int colIndex = 0; colIndex <= colCount; colIndex++)
+                        {
+                            var cell = package.Workbook.Worksheets[0].Cells[rowIndex + 1, colIndex + 1].Style;
+                            var cellValue = package.Workbook.Worksheets[0].Cells[rowIndex + 1, colIndex + 1].Text;
+
+                            if (HeaderStyle.Font.Name == cell.Font.Name 
+                                && HeaderStyle.Font.Bold == cell.Font.Bold 
+                                && !string.IsNullOrEmpty(cellValue) 
+                                && HeaderStyle.Font.Color.Indexed == cell.Font.Color.Indexed
+                                )
+                            {
+                                excelFile.Headers.Add(cellValue);
+                            }
+                        }
+                    }
                 }
             }
             excelFile.Name = file.FileName;
             excelFile.LastUpdated = DateTime.Now;
-            await _excelRepository.SaveExcelFile(excelFile);
         }
 
         public async Task UploadBasicExcel(IFormFile file)
