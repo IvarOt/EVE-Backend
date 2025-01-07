@@ -8,6 +8,8 @@ using System.Text.Json;
 using System.Data.Common;
 using OfficeOpenXml.Style;
 using OfficeOpenXml.DataValidation;
+using System.Numerics;
+using System.Runtime.CompilerServices;
 
 namespace eve_backend.logic.Services
 {
@@ -90,24 +92,68 @@ namespace eve_backend.logic.Services
 
                         if (headerLocation.Row == attributeLocation.Row)
                         {
-                            excelFile.Headers = ReadOutColumnHeaders(headerLocation.Column, rowCount, sheet, HeaderStyle);
+                            var headers = ReadOutColumnHeaders(headerLocation.Column, rowCount, sheet, HeaderStyle);
+                            excelFile.Headers = headers.Values.ToList();
+                            List<ExcelObject> objects = ReadOutColumnAttributes(attributeLocation.Column, colCount, sheet, AttributeStyle, headers);
+                            foreach (var obj in objects.ToList())
+                            {
+                                bool hasValues = false;
+                                foreach (var prop in obj.ExcelProperties)
+                                {
+                                    if (!string.IsNullOrEmpty(prop.Value))
+                                    {
+                                        hasValues = true;
+                                    }
+                                    break;
+                                }
+                                if (hasValues)
+                                {
+                                    excelFile.excelObjects.Add(obj);
+                                }
+                            }
                         }
                         else
                         {
-                            excelFile.Headers = ReadOutRowHeaders(headerLocation.Row, colCount, sheet, HeaderStyle, headerLocation.Column);
+                            var headers = ReadOutRowHeaders(headerLocation.Row, colCount, sheet, HeaderStyle, headerLocation.Column);
+                            excelFile.Headers = headers.Values.ToList();
+                            List<ExcelObject> objects = ReadOutRowAttributes(attributeLocation.Row, rowCount, sheet, AttributeStyle, headers);
+                            foreach (var obj in objects.ToList())
+                            {
+                                bool hasValues = false;
+                                foreach (var prop in obj.ExcelProperties)
+                                {
+                                    if (!string.IsNullOrEmpty(prop.Value))
+                                    {
+                                        hasValues = true;
+                                    }
+                                    break;
+                                }
+                                if (hasValues)
+                                {
+                                    excelFile.excelObjects.Add(obj);
+                                }
+                            }
                         }
                     }
                 }
-            }
+            }  
             excelFile.Name = file.FileName;
             excelFile.LastUpdated = DateTime.Now;
+            excelFile.ObjectIdentifier = excelFile.excelObjects.FirstOrDefault().ExcelProperties.FirstOrDefault().Name;
+            foreach (var obj in excelFile.excelObjects)
+            {
+                obj.Identifier = obj.ExcelProperties.Where(x => x.Name == excelFile.ObjectIdentifier).FirstOrDefault().Value.ToString();
+
+            }
+            await _excelRepository.SaveExcelFile(excelFile);
+
         }
 
-        private List<string> ReadOutColumnHeaders(int headerLocationColumn, int rowCount, ExcelWorksheet sheet, ExcelStyle HeaderStyle)
+        private Dictionary<int, string> ReadOutColumnHeaders(int headerLocationColumn, int rowCount, ExcelWorksheet sheet, ExcelStyle HeaderStyle)
         {
             //column headers
             var headerStart = headerLocationColumn;
-            List<string> headers = new List<string>();
+            Dictionary<int, string> headers = new Dictionary<int, string>();
             for (int i = headerStart; i <= rowCount; i++)
             {
                 var cell = sheet.Cells[i, headerLocationColumn].Style;
@@ -120,15 +166,51 @@ namespace eve_backend.logic.Services
                                                 && HeaderStyle.Fill.BackgroundColor.Rgb == cell.Fill.BackgroundColor.Rgb
                                                 )
                 {
-                    headers.Add(cellValue);
+                    headers.Add(i, cellValue.Trim());
                 }
             }
             return headers;
         }
 
-        private List<string> ReadOutRowHeaders(int headerLocationRow, int rowCount, ExcelWorksheet sheet, ExcelStyle HeaderStyle, int headerLocationColumn)
+        private List<ExcelObject> ReadOutColumnAttributes(int AttributeLocationColumn, int collCount ,ExcelWorksheet sheet, ExcelStyle HeaderStyle, Dictionary<int, string> headers)
         {
-            List<string> headers = new List<string>();
+            //column attributes
+            List<ExcelObject> attributes = new List<ExcelObject>();
+            for (int colIndex = AttributeLocationColumn; colIndex <= collCount; colIndex++)
+            {
+                ExcelObject excelObject = new ExcelObject();
+                foreach (var row in headers)
+                {
+                    var cell = sheet.Cells[row.Key, colIndex].Style;
+                    var cellValue = sheet.Cells[row.Key, colIndex].Text;
+
+                    if (HeaderStyle.Font.Name == cell.Font.Name
+                                                    && HeaderStyle.Font.Bold == cell.Font.Bold
+                                                    && HeaderStyle.Font.Color.Indexed == cell.Font.Color.Indexed
+                                                    && HeaderStyle.Fill.BackgroundColor.Rgb == cell.Fill.BackgroundColor.Rgb
+                                                    )
+                    {
+                        if (cellValue == "" || cellValue == null)
+                        {
+                            excelObject.ExcelProperties.Add(new ExcelProperty { Name = row.Value, Value = "" });
+                        } else
+                        {
+                            string trimmed = cellValue.Trim();
+                            excelObject.ExcelProperties.Add(new ExcelProperty { Name = row.Value, Value = trimmed }) ;
+                        }
+                    } 
+                }
+                excelObject.Identifier = "";
+                excelObject.LastUpdated = DateTime.Now;
+                attributes.Add(excelObject);
+
+            }
+            return attributes;
+        }
+
+        private Dictionary<int, string> ReadOutRowHeaders(int headerLocationRow, int rowCount, ExcelWorksheet sheet, ExcelStyle HeaderStyle, int headerLocationColumn)
+        {
+            Dictionary<int, string> headers = new Dictionary<int, string>();
 
             for (int i = headerLocationColumn; i <= rowCount; i++)
             {
@@ -142,10 +224,48 @@ namespace eve_backend.logic.Services
                         && HeaderStyle.Fill.BackgroundColor.Rgb == cell.Fill.BackgroundColor.Rgb
                         )
                 {
-                    headers.Add(cellValue);
+                    headers.Add(i, cellValue.Trim());
                 }
             }
             return headers;
+        }
+
+
+        private List<ExcelObject> ReadOutRowAttributes(int AttributeLocationRow, int RowCount, ExcelWorksheet sheet, ExcelStyle HeaderStyle, Dictionary<int, string> headers)
+        {
+            //column attributes
+            List<ExcelObject> attributes = new List<ExcelObject>();
+            for (int rowIndex = AttributeLocationRow; rowIndex <= RowCount; rowIndex++)
+            {
+                ExcelObject excelObject = new ExcelObject();
+                foreach (var colls in headers)
+                {
+                    var cell = sheet.Cells[rowIndex, colls.Key].Style;
+                    var cellValue = sheet.Cells[rowIndex, colls.Key].Text;
+
+                    if (HeaderStyle.Font.Name == cell.Font.Name
+                                                    && HeaderStyle.Font.Bold == cell.Font.Bold
+                                                    && HeaderStyle.Font.Color.Indexed == cell.Font.Color.Indexed
+                                                    && HeaderStyle.Fill.BackgroundColor.Rgb == cell.Fill.BackgroundColor.Rgb
+                                                    )
+                    {
+                        if (cellValue == "" || cellValue == null)
+                        {
+                            excelObject.ExcelProperties.Add(new ExcelProperty { Name = colls.Value, Value = "" });
+                        }
+                        else
+                        {
+                            string trimmed = cellValue.Trim();
+                            excelObject.ExcelProperties.Add(new ExcelProperty { Name = colls.Value, Value = trimmed });
+                        }
+                    }
+                }
+                excelObject.Identifier = "";
+                excelObject.LastUpdated = DateTime.Now;
+                attributes.Add(excelObject);
+
+            }
+            return attributes;
         }
 
         public async Task UploadBasicExcel(IFormFile file)

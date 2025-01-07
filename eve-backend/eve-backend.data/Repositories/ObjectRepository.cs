@@ -53,6 +53,17 @@ namespace eve_backend.data.Repositories
         public async Task UpdateObject(int objectId, DateTime dateTime)
         {
             var objectToUpdate = await _context.ExcelObjects.Where(x => x.Id == objectId).FirstOrDefaultAsync();
+            var excelFileToUpdate = await _context.ExcelFiles.Where(x => x.Id == objectToUpdate.ExcelFileId).FirstOrDefaultAsync();
+            var objectidentifier = excelFileToUpdate.ObjectIdentifier;
+
+            foreach (var item in objectToUpdate.ExcelProperties)
+            {
+                if (item.Name == objectidentifier)
+                {
+                    objectToUpdate.Identifier = item.Value;
+                }
+            }
+
             if (objectToUpdate == null)
             {
                 throw new FileNotFoundException();
