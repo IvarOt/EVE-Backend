@@ -104,7 +104,6 @@ namespace eve_backend.logic.Services
                                     {
                                         hasValues = true;
                                     }
-                                    break;
                                 }
                                 if (hasValues)
                                 {
