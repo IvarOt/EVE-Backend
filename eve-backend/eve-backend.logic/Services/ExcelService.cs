@@ -135,17 +135,16 @@ namespace eve_backend.logic.Services
                         }
                     }
                 }
-            }  
+            }
             excelFile.Name = file.FileName;
             excelFile.LastUpdated = DateTime.Now;
-            excelFile.ObjectIdentifier = excelFile.excelObjects.FirstOrDefault().ExcelProperties.FirstOrDefault().Name;
+            excelFile.ObjectIdentifier = excelFile.Headers.FirstOrDefault();
             foreach (var obj in excelFile.excelObjects)
             {
                 obj.Identifier = obj.ExcelProperties.Where(x => x.Name == excelFile.ObjectIdentifier).FirstOrDefault().Value.ToString();
 
             }
             await _excelRepository.SaveExcelFile(excelFile);
-
         }
 
         private Dictionary<int, string> ReadOutColumnHeaders(int headerLocationColumn, int rowCount, ExcelWorksheet sheet, ExcelStyle HeaderStyle)
@@ -171,7 +170,7 @@ namespace eve_backend.logic.Services
             return headers;
         }
 
-        private List<ExcelObject> ReadOutColumnAttributes(int AttributeLocationColumn, int collCount ,ExcelWorksheet sheet, ExcelStyle HeaderStyle, Dictionary<int, string> headers)
+        private List<ExcelObject> ReadOutColumnAttributes(int AttributeLocationColumn, int collCount, ExcelWorksheet sheet, ExcelStyle HeaderStyle, Dictionary<int, string> headers)
         {
             //column attributes
             List<ExcelObject> attributes = new List<ExcelObject>();
@@ -192,12 +191,13 @@ namespace eve_backend.logic.Services
                         if (cellValue == "" || cellValue == null)
                         {
                             excelObject.ExcelProperties.Add(new ExcelProperty { Name = row.Value, Value = "" });
-                        } else
+                        }
+                        else
                         {
                             string trimmed = cellValue.Trim();
-                            excelObject.ExcelProperties.Add(new ExcelProperty { Name = row.Value, Value = trimmed }) ;
+                            excelObject.ExcelProperties.Add(new ExcelProperty { Name = row.Value, Value = trimmed });
                         }
-                    } 
+                    }
                 }
                 excelObject.Identifier = "";
                 excelObject.LastUpdated = DateTime.Now;
