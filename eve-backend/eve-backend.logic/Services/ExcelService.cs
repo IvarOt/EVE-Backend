@@ -85,6 +85,7 @@ namespace eve_backend.logic.Services
 
                     var headerLocation = new { Row = Header.Start.Row, Column = Header.Start.Column };
                     var attributeLocation = new { Row = Attribute.Start.Row, Column = Attribute.Start.Column };
+
                     foreach (var sheet in sheets)
                     {
                         int rowCount = sheet.Dimension.Rows;
@@ -93,45 +94,22 @@ namespace eve_backend.logic.Services
                         if (headerLocation.Row == attributeLocation.Row)
                         {
                             var headers = ReadOutColumnHeaders(headerLocation.Column, rowCount, sheet, HeaderStyle);
-                            excelFile.Headers = headers.Values.ToList();
-                            List<ExcelObject> objects = ReadOutColumnAttributes(attributeLocation.Column, colCount, sheet, AttributeStyle, headers);
-                            foreach (var obj in objects.ToList())
+                            foreach (var header in headers)
                             {
-                                bool hasValues = false;
-                                foreach (var prop in obj.ExcelProperties)
-                                {
-                                    if (!string.IsNullOrEmpty(prop.Value))
-                                    {
-                                        hasValues = true;
-                                    }
-                                }
-                                if (hasValues)
-                                {
-                                    excelFile.excelObjects.Add(obj);
-                                }
+                                excelFile.Headers.Add(header.Value);
                             }
+                            List<ExcelObject> objects = ReadOutColumnAttributes(attributeLocation.Column, colCount, sheet, AttributeStyle, headers);
+                            RemoveEmptyObjects(excelFile, objects);
                         }
                         else
                         {
                             var headers = ReadOutRowHeaders(headerLocation.Row, colCount, sheet, HeaderStyle, headerLocation.Column);
-                            excelFile.Headers = headers.Values.ToList();
-                            List<ExcelObject> objects = ReadOutRowAttributes(attributeLocation.Row, rowCount, sheet, AttributeStyle, headers);
-                            foreach (var obj in objects.ToList())
+                            foreach (var header in headers)
                             {
-                                bool hasValues = false;
-                                foreach (var prop in obj.ExcelProperties)
-                                {
-                                    if (!string.IsNullOrEmpty(prop.Value))
-                                    {
-                                        hasValues = true;
-                                    }
-                                    break;
-                                }
-                                if (hasValues)
-                                {
-                                    excelFile.excelObjects.Add(obj);
-                                }
+                                excelFile.Headers.Add(header.Value);
                             }
+                            List<ExcelObject> objects = ReadOutRowAttributes(attributeLocation.Row, rowCount, sheet, AttributeStyle, headers);
+                            RemoveEmptyObjects(excelFile, objects);
                         }
                     }
                 }
@@ -141,28 +119,50 @@ namespace eve_backend.logic.Services
             excelFile.ObjectIdentifier = excelFile.Headers.FirstOrDefault();
             foreach (var obj in excelFile.excelObjects)
             {
-                obj.Identifier = obj.ExcelProperties.Where(x => x.Name == excelFile.ObjectIdentifier).FirstOrDefault().Value.ToString();
+                var property = obj.ExcelProperties.FirstOrDefault(x => x.Name == excelFile.ObjectIdentifier);
+                obj.Identifier = property != null && !string.IsNullOrEmpty(property.Value) ? property.Value : "";
 
             }
             await _excelRepository.SaveExcelFile(excelFile);
         }
 
+        private bool StylesAreEqual(ExcelStyle style1, ExcelStyle style2)
+        {
+            return style1.Font.Name == style2.Font.Name
+                && style1.Font.Bold == style2.Font.Bold
+                && style1.Font.Color.Indexed == style2.Font.Color.Indexed
+                && style1.Fill.BackgroundColor.Rgb == style2.Fill.BackgroundColor.Rgb;
+        }
+
+        private void RemoveEmptyObjects(ExcelFile excelFile, List<ExcelObject> objects)
+        {
+            foreach (var obj in objects.ToList())
+            {
+                bool hasValues = false;
+                foreach (var prop in obj.ExcelProperties)
+                {
+                    if (!string.IsNullOrEmpty(prop.Value))
+                    {
+                        hasValues = true;
+                    }
+                }
+                if (hasValues)
+                {
+                    excelFile.excelObjects.Add(obj);
+                }
+            }
+        }
+
         private Dictionary<int, string> ReadOutColumnHeaders(int headerLocationColumn, int rowCount, ExcelWorksheet sheet, ExcelStyle HeaderStyle)
         {
-            //column headers
             var headerStart = headerLocationColumn;
             Dictionary<int, string> headers = new Dictionary<int, string>();
             for (int i = headerStart; i <= rowCount; i++)
             {
-                var cell = sheet.Cells[i, headerLocationColumn].Style;
+                var cellStyle = sheet.Cells[i, headerLocationColumn].Style;
                 var cellValue = sheet.Cells[i, headerLocationColumn].Text;
 
-                if (HeaderStyle.Font.Name == cell.Font.Name
-                                                && HeaderStyle.Font.Bold == cell.Font.Bold
-                                                && !string.IsNullOrEmpty(cellValue)
-                                                && HeaderStyle.Font.Color.Indexed == cell.Font.Color.Indexed
-                                                && HeaderStyle.Fill.BackgroundColor.Rgb == cell.Fill.BackgroundColor.Rgb
-                                                )
+                if (StylesAreEqual(HeaderStyle, cellStyle) && !string.IsNullOrEmpty(cellValue))
                 {
                     headers.Add(i, cellValue.Trim());
                 }
@@ -170,9 +170,8 @@ namespace eve_backend.logic.Services
             return headers;
         }
 
-        private List<ExcelObject> ReadOutColumnAttributes(int AttributeLocationColumn, int collCount, ExcelWorksheet sheet, ExcelStyle HeaderStyle, Dictionary<int, string> headers)
+        private List<ExcelObject> ReadOutColumnAttributes(int AttributeLocationColumn, int collCount, ExcelWorksheet sheet, ExcelStyle attributeStyle, Dictionary<int, string> headers)
         {
-            //column attributes
             List<ExcelObject> attributes = new List<ExcelObject>();
             for (int colIndex = AttributeLocationColumn; colIndex <= collCount; colIndex++)
             {
@@ -182,13 +181,9 @@ namespace eve_backend.logic.Services
                     var cell = sheet.Cells[row.Key, colIndex].Style;
                     var cellValue = sheet.Cells[row.Key, colIndex].Text;
 
-                    if (HeaderStyle.Font.Name == cell.Font.Name
-                                                    && HeaderStyle.Font.Bold == cell.Font.Bold
-                                                    && HeaderStyle.Font.Color.Indexed == cell.Font.Color.Indexed
-                                                    && HeaderStyle.Fill.BackgroundColor.Rgb == cell.Fill.BackgroundColor.Rgb
-                                                    )
+                    if (StylesAreEqual(attributeStyle, cell))
                     {
-                        if (cellValue == "" || cellValue == null)
+                        if (string.IsNullOrEmpty(cellValue))
                         {
                             excelObject.ExcelProperties.Add(new ExcelProperty { Name = row.Value, Value = "" });
                         }
@@ -213,15 +208,10 @@ namespace eve_backend.logic.Services
 
             for (int i = headerLocationColumn; i <= rowCount; i++)
             {
-                var cell = sheet.Cells[headerLocationRow, i].Style;
+                var cellStyle = sheet.Cells[headerLocationRow, i].Style;
                 var cellValue = sheet.Cells[headerLocationRow, i].Text;
 
-                if (HeaderStyle.Font.Name == cell.Font.Name
-                        && HeaderStyle.Font.Bold == cell.Font.Bold
-                        && !string.IsNullOrEmpty(cellValue)
-                        && HeaderStyle.Font.Color.Indexed == cell.Font.Color.Indexed
-                        && HeaderStyle.Fill.BackgroundColor.Rgb == cell.Fill.BackgroundColor.Rgb
-                        )
+                if (StylesAreEqual(HeaderStyle, cellStyle) && !string.IsNullOrEmpty(cellValue))
                 {
                     headers.Add(i, cellValue.Trim());
                 }
@@ -230,25 +220,20 @@ namespace eve_backend.logic.Services
         }
 
 
-        private List<ExcelObject> ReadOutRowAttributes(int AttributeLocationRow, int RowCount, ExcelWorksheet sheet, ExcelStyle HeaderStyle, Dictionary<int, string> headers)
+        private List<ExcelObject> ReadOutRowAttributes(int AttributeLocationRow, int RowCount, ExcelWorksheet sheet, ExcelStyle attributeStyle, Dictionary<int, string> headers)
         {
-            //column attributes
             List<ExcelObject> attributes = new List<ExcelObject>();
             for (int rowIndex = AttributeLocationRow; rowIndex <= RowCount; rowIndex++)
             {
                 ExcelObject excelObject = new ExcelObject();
                 foreach (var colls in headers)
                 {
-                    var cell = sheet.Cells[rowIndex, colls.Key].Style;
+                    var cellStyle = sheet.Cells[rowIndex, colls.Key].Style;
                     var cellValue = sheet.Cells[rowIndex, colls.Key].Text;
 
-                    if (HeaderStyle.Font.Name == cell.Font.Name
-                                                    && HeaderStyle.Font.Bold == cell.Font.Bold
-                                                    && HeaderStyle.Font.Color.Indexed == cell.Font.Color.Indexed
-                                                    && HeaderStyle.Fill.BackgroundColor.Rgb == cell.Fill.BackgroundColor.Rgb
-                                                    )
+                    if (StylesAreEqual(attributeStyle, cellStyle))
                     {
-                        if (cellValue == "" || cellValue == null)
+                        if (string.IsNullOrEmpty(cellValue))
                         {
                             excelObject.ExcelProperties.Add(new ExcelProperty { Name = colls.Value, Value = "" });
                         }
@@ -262,7 +247,6 @@ namespace eve_backend.logic.Services
                 excelObject.Identifier = "";
                 excelObject.LastUpdated = DateTime.Now;
                 attributes.Add(excelObject);
-
             }
             return attributes;
         }
