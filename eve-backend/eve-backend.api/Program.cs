@@ -29,10 +29,18 @@ builder.Services.AddCors(options =>
             .AllowAnyHeader()
             .AllowAnyMethod();
         });
-}); builder.Services.AddDbContext<ApplicationDbContext>(options =>
+});
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     var connectionstring = builder.Configuration.GetConnectionString("DefaultConnection");
-    options.UseSqlServer(connectionstring, b => b.MigrationsAssembly("eve-backend.api"));
+    options.UseSqlServer(connectionstring, sqlOptions =>
+    {
+        sqlOptions.MigrationsAssembly("eve-backend.api");
+        sqlOptions.EnableRetryOnFailure(
+            maxRetryCount: 5,
+            maxRetryDelay: TimeSpan.FromSeconds(30),
+            errorNumbersToAdd: null);
+    });
 });
 var app = builder.Build();
 
@@ -50,5 +58,7 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+
 
 app.Run();
