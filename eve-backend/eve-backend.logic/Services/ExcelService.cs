@@ -144,6 +144,7 @@ namespace eve_backend.logic.Services
                     if (!string.IsNullOrEmpty(prop.Value))
                     {
                         hasValues = true;
+                        break;
                     }
                 }
                 if (hasValues)
